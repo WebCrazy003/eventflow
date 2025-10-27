@@ -133,7 +133,7 @@ watch(result, (newResult) => {
   if (newResult?.events) {
     events.value = newResult.events.edges.map((edge: any) => edge.node)
     hasNextPage.value = newResult.events.pageInfo.hasNextPage
-    endCursor.value = newResult.events.pageInfo.endCursor
+    //endCursor.value = newResult.events.pageInfo.endCursor
     loading.value = false
   }
 })
