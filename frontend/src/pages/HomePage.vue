@@ -87,11 +87,11 @@
           </p>
         </div>
         
-        <div v-if="loading" class="text-center">
+        <!-- <div v-if="loading" class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        </div>
+        </div> -->
         
-        <div v-else-if="events.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-if="events.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div
             v-for="event in events.slice(0, 6)"
             :key="event.id"
@@ -145,7 +145,7 @@ import type { Event } from '@/types'
 
 const authStore = useAuthStore()
 const events = ref<Event[]>([])
-const loading = ref(true)
+// const loading = ref(true)
 
 const { result } = useQuery(EVENTS_QUERY, {
   filter: {},
@@ -155,7 +155,7 @@ const { result } = useQuery(EVENTS_QUERY, {
 onMounted(() => {
   if (result.value) {
     events.value = result.value.events.edges.map((edge: any) => edge.node)
-    loading.value = false
+    // loading.value = false
   }
 })
 
