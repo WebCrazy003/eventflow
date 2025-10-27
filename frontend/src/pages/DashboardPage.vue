@@ -102,75 +102,78 @@
 
     <!-- Create Event Modal -->
     <Modal :show="showCreateForm" title="Create New Event" @close="showCreateForm = false">
-      <form @submit.prevent="createEvent">
-        <div class="space-y-4">
-          <Input
-            id="title"
-            v-model="newEvent.title"
-            type="text"
-            label="Title"
-            :required="true"
-          />
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              v-model="newEvent.description"
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            ></textarea>
-          </div>
-          
-          <Input
-            id="location"
-            v-model="newEvent.location"
-            type="text"
-            label="Location"
-          />
-          
-          <div class="grid grid-cols-2 gap-4">
+      <template #default>
+        <form @submit.prevent="createEvent">
+          <div class="space-y-4">
             <Input
-              id="startAt"
-              v-model="newEvent.startAt"
-              type="datetime-local"
-              label="Start Date"
+              id="title"
+              v-model="newEvent.title"
+              type="text"
+              label="Title"
               :required="true"
             />
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea
+                v-model="newEvent.description"
+                rows="3"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              ></textarea>
+            </div>
+            
             <Input
-              id="endAt"
-              v-model="newEvent.endAt"
-              type="datetime-local"
-              label="End Date"
+              id="location"
+              v-model="newEvent.location"
+              type="text"
+              label="Location"
+            />
+            
+            <div class="grid grid-cols-2 gap-4">
+              <Input
+                id="startAt"
+                v-model="newEvent.startAt"
+                type="datetime-local"
+                label="Start Date"
+                :required="true"
+              />
+              <Input
+                id="endAt"
+                v-model="newEvent.endAt"
+                type="datetime-local"
+                label="End Date"
+                :required="true"
+              />
+            </div>
+            
+            <Input
+              id="capacity"
+              v-model.number="newEvent.capacity"
+              type="number"
+              label="Capacity"
               :required="true"
             />
           </div>
-          
-          <Input
-            id="capacity"
-            v-model.number="newEvent.capacity"
-            type="number"
-            label="Capacity"
-            :required="true"
-          />
-        </div>
-        
-        <template #footer>
-          <button
-            type="button"
-            @click="showCreateForm = false"
-            class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            :disabled="creating"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {{ creating ? 'Creating...' : 'Create Event' }}
-          </button>
-        </template>
-      </form>
+        </form>
+      </template>
+      
+      <template #footer>
+        <button
+          type="button"
+          @click="showCreateForm = false"
+          class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          @click="createEvent"
+          :disabled="creating"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          {{ creating ? 'Creating...' : 'Create Event' }}
+        </button>
+      </template>
     </Modal>
   </div>
 </template>
