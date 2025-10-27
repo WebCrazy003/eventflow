@@ -82,7 +82,14 @@ router.beforeEach((to, _from, next) => {
   }
   
   // Check if route requires specific roles
+  // Note: user might not be loaded yet on initial page load
   if (to.meta.requiredRoles && authStore.isAuthenticated) {
+    if (!authStore.user) {
+      // User not loaded yet, allow navigation and let the component handle auth
+      next()
+      return
+    }
+    
     const hasRequiredRole = (to.meta.requiredRoles as Role[]).some((role: Role) => 
       authStore.user?.roles.includes(role)
     )

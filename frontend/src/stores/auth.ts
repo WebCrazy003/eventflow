@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   const refreshToken = ref<string | null>(localStorage.getItem('refreshToken'))
   const isLoading = ref(false)
 
-  const isAuthenticated = computed(() => !!user.value && !!accessToken.value)
+  const isAuthenticated = computed(() => !!accessToken.value)
   
   const hasRole = computed(() => (roles: Role[]) => {
     if (!user.value) return false
