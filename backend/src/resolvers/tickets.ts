@@ -13,7 +13,7 @@ export const ticketResolvers = {
           event: {
             include: {
               organizer: true,
-              images: true,
+              // images: true,
             },
           },
         },
@@ -125,7 +125,7 @@ export const ticketResolvers = {
             event: {
               include: {
                 organizer: true,
-                images: true,
+                // images: true,
               },
             },
           },
@@ -198,7 +198,7 @@ export const ticketResolvers = {
           event: {
             include: {
               organizer: true,
-              images: true,
+              // images: true,
             },
           },
         },
