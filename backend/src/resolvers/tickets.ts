@@ -125,6 +125,9 @@ export const ticketResolvers = {
             event: {
               include: {
                 organizer: true,
+                tickets: {
+                  where: { status: TicketStatus.CONFIRMED },
+                },
                 // images: true,
               },
             },
@@ -198,6 +201,9 @@ export const ticketResolvers = {
           event: {
             include: {
               organizer: true,
+              tickets: {
+                where: { status: TicketStatus.CONFIRMED },
+              },
               // images: true,
             },
           },

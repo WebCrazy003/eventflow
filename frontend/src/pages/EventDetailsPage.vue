@@ -184,8 +184,9 @@ const canBookTicket = computed(() => {
   if (!authStore.isAuthenticated || !event.value) return false
   
   // Check if user already has a ticket
+  console.log("event.value.tickets:", event.value.tickets)
   const userTicket = event.value.tickets?.find((ticket: any) => 
-    ticket.userId === authStore.user?.id && ticket.status === 'CONFIRMED'
+    ticket?.user?.id === authStore.user?.id && ticket.status === 'CONFIRMED'
   )
   
   return !userTicket && remainingTickets.value > 0 && !isEventPast(event.value.startAt)
