@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from '@apollo/client/core'
 
 // Auth queries and mutations
 export const REGISTER_MUTATION = gql`
