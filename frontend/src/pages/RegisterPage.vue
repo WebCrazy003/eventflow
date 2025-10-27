@@ -15,61 +15,42 @@
       
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="space-y-4">
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              id="name"
-              v-model="form.name"
-              name="name"
-              type="text"
-              autocomplete="name"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter your full name"
-            />
-          </div>
-          
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
-            <input
-              id="email"
-              v-model="form.email"
-              name="email"
-              type="email"
-              autocomplete="email"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter your email"
-            />
-          </div>
-          
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              id="password"
-              v-model="form.password"
-              name="password"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Enter your password"
-            />
-          </div>
-          
-          <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="Confirm your password"
-            />
-          </div>
+          <Input
+            id="name"
+            v-model="form.name"
+            type="text"
+            autocomplete="name"
+            label="Full Name"
+            placeholder="Enter your full name"
+            :required="true"
+          />
+          <Input
+            id="email"
+            v-model="form.email"
+            type="email"
+            autocomplete="email"
+            label="Email Address"
+            placeholder="Enter your email"
+            :required="true"
+          />
+          <Input
+            id="password"
+            v-model="form.password"
+            type="password"
+            autocomplete="new-password"
+            label="Password"
+            placeholder="Enter your password"
+            :required="true"
+          />
+          <Input
+            id="confirmPassword"
+            v-model="form.confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            label="Confirm Password"
+            placeholder="Confirm your password"
+            :required="true"
+          />
         </div>
 
         <div v-if="error" class="text-red-600 text-sm text-center">
@@ -101,6 +82,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import Input from '@/components/Input.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

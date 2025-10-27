@@ -8,61 +8,33 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-blue-100 rounded-lg">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <div class="text-2xl font-bold text-gray-900">{{ totalUsers }}</div>
-              <div class="text-sm text-gray-500">Total Users</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-green-100 rounded-lg">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <div class="text-2xl font-bold text-gray-900">{{ totalEvents }}</div>
-              <div class="text-sm text-gray-500">Total Events</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-purple-100 rounded-lg">
-              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <div class="text-2xl font-bold text-gray-900">{{ totalTickets }}</div>
-              <div class="text-sm text-gray-500">Total Tickets</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-yellow-100 rounded-lg">
-              <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <div class="text-2xl font-bold text-gray-900">{{ totalRevenue }}</div>
-              <div class="text-sm text-gray-500">Total Revenue</div>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          :value="totalUsers"
+          label="Total Users"
+          icon-bg-class="bg-blue-100"
+          icon-color-class="text-blue-600"
+          :icon-path="'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z'"
+        />
+        <StatCard
+          :value="totalEvents"
+          label="Total Events"
+          icon-bg-class="bg-green-100"
+          icon-color-class="text-green-600"
+        />
+        <StatCard
+          :value="totalTickets"
+          label="Total Tickets"
+          icon-bg-class="bg-purple-100"
+          icon-color-class="text-purple-600"
+          :icon-path="'M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z'"
+        />
+        <StatCard
+          :value="totalRevenue"
+          label="Total Revenue"
+          icon-bg-class="bg-yellow-100"
+          icon-color-class="text-yellow-600"
+          :icon-path="'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'"
+        />
       </div>
 
       <!-- Users Management -->
@@ -71,10 +43,7 @@
           <h2 class="text-xl font-semibold text-gray-900">Users Management</h2>
         </div>
         
-        <div v-if="usersLoading" class="text-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p class="mt-4 text-gray-600">Loading users...</p>
-        </div>
+        <LoadingSpinner v-if="usersLoading" message="Loading users..." />
 
         <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
@@ -186,62 +155,58 @@
     </div>
 
     <!-- Edit User Roles Modal -->
-    <div v-if="showRoleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <h2 class="text-xl font-semibold mb-4">Edit User Roles</h2>
-        
-        <div class="mb-4">
-          <p class="text-sm text-gray-600 mb-2">User: {{ selectedUser?.name }}</p>
-          <p class="text-sm text-gray-600">Email: {{ selectedUser?.email }}</p>
-        </div>
-        
-        <div class="space-y-3">
-          <label class="flex items-center">
-            <input
-              v-model="selectedRoles"
-              type="checkbox"
-              value="USER"
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span class="ml-2 text-sm text-gray-700">User</span>
-          </label>
-          <label class="flex items-center">
-            <input
-              v-model="selectedRoles"
-              type="checkbox"
-              value="ORGANIZER"
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span class="ml-2 text-sm text-gray-700">Organizer</span>
-          </label>
-          <label class="flex items-center">
-            <input
-              v-model="selectedRoles"
-              type="checkbox"
-              value="ADMIN"
-              class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span class="ml-2 text-sm text-gray-700">Admin</span>
-          </label>
-        </div>
-        
-        <div class="flex justify-end space-x-3 mt-6">
-          <button
-            @click="showRoleModal = false"
-            class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            @click="updateUserRoles"
-            :disabled="updating"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {{ updating ? 'Updating...' : 'Update Roles' }}
-          </button>
-        </div>
+    <Modal :show="showRoleModal" title="Edit User Roles" @close="showRoleModal = false">
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-2">User: {{ selectedUser?.name }}</p>
+        <p class="text-sm text-gray-600">Email: {{ selectedUser?.email }}</p>
       </div>
-    </div>
+      
+      <div class="space-y-3">
+        <label class="flex items-center">
+          <input
+            v-model="selectedRoles"
+            type="checkbox"
+            value="USER"
+            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span class="ml-2 text-sm text-gray-700">User</span>
+        </label>
+        <label class="flex items-center">
+          <input
+            v-model="selectedRoles"
+            type="checkbox"
+            value="ORGANIZER"
+            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span class="ml-2 text-sm text-gray-700">Organizer</span>
+        </label>
+        <label class="flex items-center">
+          <input
+            v-model="selectedRoles"
+            type="checkbox"
+            value="ADMIN"
+            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span class="ml-2 text-sm text-gray-700">Admin</span>
+        </label>
+      </div>
+      
+      <template #footer>
+        <button
+          @click="showRoleModal = false"
+          class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          @click="updateUserRoles"
+          :disabled="updating"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          {{ updating ? 'Updating...' : 'Update Roles' }}
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -252,6 +217,9 @@ import { USERS_QUERY, EVENTS_QUERY, UPDATE_USER_ROLES_MUTATION, DELETE_USER_MUTA
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import type { User, Role } from '@/types'
+import StatCard from '@/components/StatCard.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import Modal from '@/components/Modal.vue'
 
 const authStore = useAuthStore()
 const toast = useToast()

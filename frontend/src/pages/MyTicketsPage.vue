@@ -6,26 +6,23 @@
         <p class="mt-2 text-gray-600">View and manage your event tickets</p>
       </div>
 
-      <div v-if="loading" class="text-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p class="mt-4 text-gray-600">Loading your tickets...</p>
-      </div>
+      <LoadingSpinner v-if="loading" message="Loading your tickets..." />
 
-      <div v-else-if="tickets.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No tickets found</h3>
-        <p class="mt-1 text-sm text-gray-500">You haven't booked any events yet.</p>
-        <div class="mt-6">
+      <EmptyState
+        v-else-if="tickets.length === 0"
+        title="No tickets found"
+        description="You haven't booked any events yet."
+        :path="'M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z'"
+      >
+        <template #action>
           <router-link
             to="/events"
             class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
           >
             Browse Events
           </router-link>
-        </div>
-      </div>
+        </template>
+      </EmptyState>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
@@ -111,6 +108,8 @@ import { useQuery, useMutation } from '@vue/apollo-composable'
 import { MY_TICKETS_QUERY, CANCEL_TICKET_MUTATION } from '@/graphql/queries'
 import { useToast } from 'vue-toastification'
 import type { Ticket } from '@/types'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import EmptyState from '@/components/EmptyState.vue'
 
 const toast = useToast()
 const cancelling = ref(false)
