@@ -15,22 +15,25 @@
 </template>
 
 <script setup lang="ts">
+type StrokeLinecap = 'inherit' | 'round' | 'butt' | 'square'
+type StrokeLinejoin = 'inherit' | 'round' | 'miter' | 'bevel'
+
 const props = defineProps<{
   value: number | string
   label: string
   iconBgClass?: string
   iconColorClass?: string
   iconPath?: string
-  strokeLinecap?: string
-  strokeLinejoin?: string
+  strokeLinecap?: StrokeLinecap
+  strokeLinejoin?: StrokeLinejoin
   strokeWidth?: string
 }>()
 
 const iconBgClass = props.iconBgClass || 'bg-blue-100'
 const iconColorClass = props.iconColorClass || 'text-blue-600'
 const iconPath = props.iconPath || 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
-const strokeLinecap = props.strokeLinecap || 'round'
-const strokeLinejoin = props.strokeLinejoin || 'round'
+const strokeLinecap = props.strokeLinecap || ('round' as StrokeLinecap)
+const strokeLinejoin = props.strokeLinejoin || ('round' as StrokeLinejoin)
 const strokeWidth = props.strokeWidth || '2'
 </script>
 

@@ -56,17 +56,19 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
 
+interface FilterType {
+  search: string
+  location: string
+  startDate: string
+  endDate: string
+}
+
 const props = defineProps<{
-  modelValue: {
-    search: string
-    location: string
-    startDate: string
-    endDate: string
-  }
+  modelValue: FilterType
 }>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: typeof props.modelValue]
+  'update:modelValue': [value: FilterType]
 }>()
 
 const localFilters = reactive({ ...props.modelValue })

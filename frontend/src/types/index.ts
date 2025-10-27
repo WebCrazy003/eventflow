@@ -21,6 +21,11 @@ export interface User {
   updatedAt: string
 }
 
+export interface EventImage {
+  url: string
+  alt?: string
+}
+
 export interface Event {
   id: string
   title: string
@@ -31,6 +36,7 @@ export interface Event {
   capacity: number
   organizer: User
   organizerId: string
+  images?: EventImage[]
   tickets?: Ticket[]
   createdAt: string
   updatedAt: string

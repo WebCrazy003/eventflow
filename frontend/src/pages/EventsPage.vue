@@ -64,7 +64,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { EVENTS_QUERY } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
-import type { Event, EventFilter, PaginationInput } from '@/types'
+import type { Event, PaginationInput } from '@/types'
 import EventFilters from '@/components/EventFilters.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -72,7 +72,7 @@ import EventCard from '@/components/EventCard.vue'
 
 const authStore = useAuthStore()
 
-const filters = reactive<EventFilter>({
+const filters = reactive({
   search: '',
   location: '',
   startDate: '',
