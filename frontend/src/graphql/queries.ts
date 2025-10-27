@@ -72,11 +72,6 @@ export const EVENTS_QUERY = gql`
           startAt
           endAt
           capacity
-          images {
-            id
-            url
-            alt
-          }
           organizer {
             id
             name
@@ -109,11 +104,6 @@ export const EVENT_QUERY = gql`
       startAt
       endAt
       capacity
-      images {
-        id
-        url
-        alt
-      }
       organizer {
         id
         name
@@ -185,11 +175,6 @@ export const MY_TICKETS_QUERY = gql`
         location
         startAt
         endAt
-        images {
-          id
-          url
-          alt
-        }
         organizer {
           id
           name
