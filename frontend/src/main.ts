@@ -4,6 +4,7 @@ import { createApolloClient } from './apollo/client'
 import { DefaultApolloClient } from '@vue/apollo-composable'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import './assets/index.css'
 
 import App from './App.vue'
 import router from './router'
