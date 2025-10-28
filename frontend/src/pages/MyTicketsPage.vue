@@ -121,7 +121,7 @@ const tickets = ref<Ticket[]>([])
 
 // Function to be called after fetching result
 const onFetchComplete = (result: any) => {
-  if (result) {
+  if (result?.data) {
     tickets.value = result.data.myTickets
   }
 }
@@ -168,7 +168,7 @@ const cancelTicket = async (ticketId: string) => {
 }
 
 onMounted(() => {
-  refetch();
+  refetch()
 })
 </script>
 

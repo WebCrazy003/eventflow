@@ -92,10 +92,21 @@ const pagination = computed<PaginationInput>(() => ({
   after: endCursor.value || undefined,
 }))
 
-const { result, loading: queryLoading, fetchMore } = useQuery(EVENTS_QUERY, {
+const { result, loading: queryLoading, fetchMore, refetch, onResult } = useQuery(EVENTS_QUERY, {
   filter: filters,
   pagination: pagination,
 })
+
+const onFetchComplete = (result: any) => {
+  if (result?.data) {
+    const { data } = result
+    events.value = data.events.edges.map((edge: any) => edge.node)
+    hasNextPage.value = data.events.pageInfo.hasNextPage
+    //endCursor.value = newResult.events.pageInfo.endCursor
+    loading.value = false
+  }
+}
+onResult(onFetchComplete)
 
 const loadMore = async () => {
   if (!hasNextPage.value || queryLoading.value) return
@@ -134,20 +145,12 @@ watch(filters, () => {
 // Watch for query results
 watch(result, (newResult) => {
   if (newResult?.events) {
-    events.value = newResult.events.edges.map((edge: any) => edge.node)
-    hasNextPage.value = newResult.events.pageInfo.hasNextPage
-    //endCursor.value = newResult.events.pageInfo.endCursor
-    loading.value = false
+    onFetchComplete({ data: newResult })
   }
 })
 
 onMounted(() => {
-  if (result.value) {
-    events.value = result.value.events.edges.map((edge: any) => edge.node)
-    hasNextPage.value = result.value.events.pageInfo.hasNextPage
-    endCursor.value = result.value.events.pageInfo.endCursor
-    loading.value = false
-  }
+  refetch()
 })
 </script>
 
