@@ -73,6 +73,12 @@ const emit = defineEmits<{
 
 const localFilters = reactive({ ...props.modelValue })
 
+// Watch props to update localFilters when parent changes
+watch(() => props.modelValue, (newValue) => {
+  Object.assign(localFilters, newValue)
+}, { deep: true })
+
+// Watch localFilters to emit changes to parent
 watch(localFilters, (newValue) => {
   emit('update:modelValue', newValue)
 }, { deep: true })
