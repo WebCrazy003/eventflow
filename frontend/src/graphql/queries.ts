@@ -103,6 +103,7 @@ export const EVENT_QUERY = gql`
       location
       startAt
       endAt
+      createdAt
       capacity
       organizer {
         id
@@ -116,6 +117,7 @@ export const EVENT_QUERY = gql`
         user {
           id
           name
+          email
         }
       }
     }
