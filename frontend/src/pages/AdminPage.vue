@@ -102,56 +102,6 @@
           </table>
         </div>
       </div>
-
-      <!-- System Settings -->
-      <div class="bg-white rounded-lg shadow-md">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-900">System Settings</h2>
-        </div>
-        <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Database</h3>
-              <div class="space-y-2">
-                <button
-                  @click="seedDatabase"
-                  :disabled="seeding"
-                  class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {{ seeding ? 'Seeding...' : 'Seed Database' }}
-                </button>
-                <button
-                  @click="resetDatabase"
-                  :disabled="resetting"
-                  class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
-                >
-                  {{ resetting ? 'Resetting...' : 'Reset Database' }}
-                </button>
-              </div>
-            </div>
-            
-            <div>
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Maintenance</h3>
-              <div class="space-y-2">
-                <button
-                  @click="clearCache"
-                  :disabled="clearing"
-                  class="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50"
-                >
-                  {{ clearing ? 'Clearing...' : 'Clear Cache' }}
-                </button>
-                <button
-                  @click="exportData"
-                  :disabled="exporting"
-                  class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
-                >
-                  {{ exporting ? 'Exporting...' : 'Export Data' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Edit User Roles Modal -->
@@ -228,10 +178,6 @@ const showRoleModal = ref(false)
 const selectedUser = ref<User | null>(null)
 const selectedRoles = ref<Role[]>([])
 const updating = ref(false)
-const seeding = ref(false)
-const resetting = ref(false)
-const clearing = ref(false)
-const exporting = ref(false)
 
 const { result: usersResult, loading: usersLoading, refetch: refetchUsers } = useQuery(USERS_QUERY)
 const { result: eventsResult } = useQuery(EVENTS_QUERY, {
@@ -300,66 +246,6 @@ const deleteUser = async (userId: string) => {
   } catch (error) {
     toast.error('Failed to delete user')
     console.error('Delete user error:', error)
-  }
-}
-
-const seedDatabase = async () => {
-  seeding.value = true
-  
-  try {
-    // This would call a seed mutation
-    toast.success('Database seeded successfully!')
-  } catch (error) {
-    toast.error('Failed to seed database')
-    console.error('Seed database error:', error)
-  } finally {
-    seeding.value = false
-  }
-}
-
-const resetDatabase = async () => {
-  if (!confirm('Are you sure you want to reset the database? This will delete all data!')) {
-    return
-  }
-  
-  resetting.value = true
-  
-  try {
-    // This would call a reset mutation
-    toast.success('Database reset successfully!')
-  } catch (error) {
-    toast.error('Failed to reset database')
-    console.error('Reset database error:', error)
-  } finally {
-    resetting.value = false
-  }
-}
-
-const clearCache = async () => {
-  clearing.value = true
-  
-  try {
-    // This would clear application cache
-    toast.success('Cache cleared successfully!')
-  } catch (error) {
-    toast.error('Failed to clear cache')
-    console.error('Clear cache error:', error)
-  } finally {
-    clearing.value = false
-  }
-}
-
-const exportData = async () => {
-  exporting.value = true
-  
-  try {
-    // This would export data to CSV/JSON
-    toast.success('Data exported successfully!')
-  } catch (error) {
-    toast.error('Failed to export data')
-    console.error('Export data error:', error)
-  } finally {
-    exporting.value = false
   }
 }
 
