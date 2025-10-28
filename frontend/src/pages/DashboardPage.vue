@@ -31,7 +31,7 @@
       <!-- Create Event Button -->
       <div class="mb-8">
         <button
-          @click="showCreateForm = true"
+          @click="openCreateModal"
           class="bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors"
         >
           Create New Event
@@ -100,13 +100,13 @@
       </div>
     </div>
 
-    <!-- Create Event Modal -->
-    <Modal :show="showCreateForm" title="Create New Event" @close="showCreateForm = false">
+    <!-- Event Modal (Create/Edit) -->
+    <Modal :show="showEventModal" :title="modalTitle" @close="showEventModal = false">
       <template #default>
-        <form @submit.prevent="createEvent">
+        <form @submit.prevent="handleSubmit">
           <div class="space-y-4">
             <Input
-              id="title"
+              id="event-title"
               v-model="newEvent.title"
               type="text"
               label="Title"
@@ -123,7 +123,7 @@
             </div>
             
             <Input
-              id="location"
+              id="event-location"
               :model-value="newEvent.location || ''"
               @update:model-value="newEvent.location = $event"
               type="text"
@@ -132,14 +132,14 @@
             
             <div class="grid grid-cols-2 gap-4">
               <Input
-                id="startAt"
+                id="event-startAt"
                 v-model="newEvent.startAt"
                 type="datetime-local"
                 label="Start Date"
                 :required="true"
               />
               <Input
-                id="endAt"
+                id="event-endAt"
                 v-model="newEvent.endAt"
                 type="datetime-local"
                 label="End Date"
@@ -148,9 +148,9 @@
             </div>
             
             <div>
-              <label for="capacity" class="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+              <label for="event-capacity" class="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
               <input
-                id="capacity"
+                id="event-capacity"
                 v-model.number="newEvent.capacity"
                 type="number"
                 required
@@ -164,18 +164,18 @@
       <template #footer>
         <button
           type="button"
-          @click="showCreateForm = false"
+          @click="showEventModal = false"
           class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
         >
           Cancel
         </button>
         <button
           type="button"
-          @click="createEvent"
-          :disabled="creating"
+          @click="handleSubmit"
+          :disabled="isSaving"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          {{ creating ? 'Creating...' : 'Create Event' }}
+          {{ submitButtonText }}
         </button>
       </template>
     </Modal>
@@ -183,9 +183,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { EVENTS_QUERY, CREATE_EVENT_MUTATION, DELETE_EVENT_MUTATION } from '@/graphql/queries'
+import { EVENTS_QUERY, CREATE_EVENT_MUTATION, UPDATE_EVENT_MUTATION, DELETE_EVENT_MUTATION } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import type { Event, CreateEventInput } from '@/types'
@@ -198,8 +198,14 @@ import Input from '@/components/Input.vue'
 const authStore = useAuthStore()
 const toast = useToast()
 
-const showCreateForm = ref(false)
-const creating = ref(false)
+const showEventModal = ref(false)
+const isSaving = ref(false)
+const editingEvent = ref<Event | null>(null)
+
+// Computed properties for modal behavior
+const isEditMode = computed(() => editingEvent.value !== null)
+const modalTitle = computed(() => isEditMode.value ? 'Edit Event' : 'Create New Event')
+const submitButtonText = computed(() => isSaving.value ? (isEditMode.value ? 'Updating...' : 'Creating...') : (isEditMode.value ? 'Update Event' : 'Create Event'))
 
 const newEvent = ref<CreateEventInput>({
   title: '',
@@ -216,6 +222,7 @@ const { result, loading, refetch } = useQuery(EVENTS_QUERY, {
 })
 
 const { mutate: createEventMutation } = useMutation(CREATE_EVENT_MUTATION)
+const { mutate: updateEventMutation } = useMutation(UPDATE_EVENT_MUTATION)
 const { mutate: deleteEventMutation } = useMutation(DELETE_EVENT_MUTATION)
 
 const events = computed(() => {
@@ -250,8 +257,38 @@ const getBookedCount = (event: Event) => {
   return event.tickets?.filter(ticket => ticket.status === 'CONFIRMED').length || 0
 }
 
+const resetForm = () => {
+  newEvent.value = {
+    title: '',
+    description: '',
+    location: '',
+    startAt: '',
+    endAt: '',
+    capacity: 100,
+  }
+  editingEvent.value = null
+}
+
+const openCreateModal = () => {
+  resetForm()
+  // Set default dates
+  const now = new Date()
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  newEvent.value.startAt = tomorrow.toISOString().slice(0, 16)
+  newEvent.value.endAt = new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16)
+  showEventModal.value = true
+}
+
+const handleSubmit = async () => {
+  if (isEditMode.value) {
+    await updateEvent()
+  } else {
+    await createEvent()
+  }
+}
+
 const createEvent = async () => {
-  creating.value = true
+  isSaving.value = true
   
   try {
     await createEventMutation({
@@ -263,31 +300,58 @@ const createEvent = async () => {
     })
     
     toast.success('Event created successfully!')
-    showCreateForm.value = false
-    
-    // Reset form
-    newEvent.value = {
-      title: '',
-      description: '',
-      location: '',
-      startAt: '',
-      endAt: '',
-      capacity: 100,
-    }
-    
-    // Refresh events list
+    showEventModal.value = false
+    resetForm()
     await refetch()
   } catch (error) {
     toast.error('Failed to create event')
     console.error('Create event error:', error)
   } finally {
-    creating.value = false
+    isSaving.value = false
   }
 }
 
-const editEvent = (_event: Event) => {
-  // This would open an edit modal or navigate to edit page
-  toast.info('Edit functionality coming soon!')
+const editEvent = (event: Event) => {
+  editingEvent.value = event
+  newEvent.value = {
+    title: event.title,
+    description: event.description || '',
+    location: event.location || '',
+    startAt: new Date(event.startAt).toISOString().slice(0, 16),
+    endAt: new Date(event.endAt).toISOString().slice(0, 16),
+    capacity: event.capacity,
+  }
+  showEventModal.value = true
+}
+
+const updateEvent = async () => {
+  if (!editingEvent.value) return
+  
+  isSaving.value = true
+  
+  try {
+    await updateEventMutation({
+      id: editingEvent.value.id,
+      input: {
+        title: newEvent.value.title,
+        description: newEvent.value.description,
+        location: newEvent.value.location,
+        startAt: new Date(newEvent.value.startAt).toISOString(),
+        endAt: new Date(newEvent.value.endAt).toISOString(),
+        capacity: newEvent.value.capacity,
+      }
+    })
+    
+    toast.success('Event updated successfully!')
+    showEventModal.value = false
+    resetForm()
+    await refetch()
+  } catch (error) {
+    toast.error('Failed to update event')
+    console.error('Update event error:', error)
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const deleteEvent = async (eventId: string) => {
@@ -307,13 +371,5 @@ const deleteEvent = async (eventId: string) => {
   }
 }
 
-onMounted(() => {
-  // Set default dates
-  const now = new Date()
-  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-  
-  newEvent.value.startAt = tomorrow.toISOString().slice(0, 16)
-  newEvent.value.endAt = new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16)
-})
 </script>
 
