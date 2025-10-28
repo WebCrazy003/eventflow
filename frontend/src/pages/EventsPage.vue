@@ -63,11 +63,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { EVENTS_QUERY } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
-import type { Event, PaginationInput } from '@/types'
+import type { Event } from '@/types'
 import EventFilters from '@/components/EventFilters.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -87,14 +87,13 @@ const loading = ref(true)
 const hasNextPage = ref(false)
 const endCursor = ref<string | null>(null)
 
-const pagination = computed<PaginationInput>(() => ({
-  first: 12,
-  after: endCursor.value || undefined,
-}))
 
-const { result, loading: queryLoading, fetchMore, refetch, onResult } = useQuery(EVENTS_QUERY, {
+const { loading: queryLoading, fetchMore, refetch, onResult } = useQuery(EVENTS_QUERY, {
   filter: filters,
-  pagination: pagination,
+  pagination: {
+    first: 3,
+    after: endCursor.value || undefined,
+  },
 })
 
 const onFetchComplete = (result: any) => {
@@ -102,7 +101,7 @@ const onFetchComplete = (result: any) => {
     const { data } = result
     events.value = data.events.edges.map((edge: any) => edge.node)
     hasNextPage.value = data.events.pageInfo.hasNextPage
-    //endCursor.value = newResult.events.pageInfo.endCursor
+    endCursor.value = data.events.pageInfo.endCursor
     loading.value = false
   }
 }
@@ -112,22 +111,28 @@ const loadMore = async () => {
   if (!hasNextPage.value || queryLoading.value) return
   
   try {
-    const result = await fetchMore({
+    await fetchMore({
       variables: {
         filter: filters,
         pagination: {
-          first: 12,
+          first: 3,
           after: endCursor.value,
         },
       },
+      updateQuery: (previousResult: any, { fetchMoreResult }: any) => {
+        if (!fetchMoreResult) return previousResult
+
+        const newEdges = fetchMoreResult.events.edges || []
+        const prevEdges = previousResult?.events?.edges || []
+
+        return {
+          events: {
+            ...fetchMoreResult.events,
+            edges: [...prevEdges, ...newEdges],
+          },
+        }
+      },
     })
-    
-    if (result?.data?.events) {
-      const newEvents = result.data.events.edges.map((edge: any) => edge.node)
-      events.value.push(...newEvents)
-      hasNextPage.value = result.data.events.pageInfo.hasNextPage
-      endCursor.value = result.data.events.pageInfo.endCursor
-    }
   } catch (error) {
     console.error('Error loading more events:', error)
   }
@@ -135,19 +140,6 @@ const loadMore = async () => {
 
 
 
-// Watch for changes in filters and reset pagination
-watch(filters, () => {
-  events.value = []
-  endCursor.value = null
-  hasNextPage.value = false
-}, { deep: true })
-
-// Watch for query results
-watch(result, (newResult) => {
-  if (newResult?.events) {
-    onFetchComplete({ data: newResult })
-  }
-})
 
 onMounted(() => {
   refetch()
