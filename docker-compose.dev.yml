@@ -58,7 +58,7 @@ services:
       target: build
     container_name: eventflow-frontend
     environment:
-      VITE_GRAPHQL_URL: http://backend:4000/graphql
+      VITE_GRAPHQL_URL: http://localhost:4000/graphql
     ports:
       - "3000:5173"
     volumes:
