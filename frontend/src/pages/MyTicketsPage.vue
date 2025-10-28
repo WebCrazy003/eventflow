@@ -9,7 +9,7 @@
       <LoadingSpinner v-if="loading" message="Loading your tickets..." />
 
       <EmptyState
-        v-else-if="tickets.length === 0"
+        v-else-if="tickets?.length === 0"
         title="No tickets found"
         description="You haven't booked any events yet."
         :path="'M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z'"
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
 import { MY_TICKETS_QUERY, CANCEL_TICKET_MUTATION } from '@/graphql/queries'
 import { useToast } from 'vue-toastification'
@@ -114,10 +114,23 @@ import EmptyState from '@/components/EmptyState.vue'
 const toast = useToast()
 const cancelling = ref(false)
 
-const { result, loading } = useQuery(MY_TICKETS_QUERY)
+const { result, loading, refetch, onResult } = useQuery(MY_TICKETS_QUERY)
 const { mutate: cancelTicketMutation } = useMutation(CANCEL_TICKET_MUTATION)
 
 const tickets = ref<Ticket[]>([])
+
+// Function to be called after fetching result
+const onFetchComplete = (result: any) => {
+  if (result) {
+    tickets.value = result.data.myTickets
+  }
+}
+
+onResult(onFetchComplete)
+
+watch(result, (newResult) => {
+  onFetchComplete({ data: newResult});
+})
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -146,11 +159,6 @@ const cancelTicket = async (ticketId: string) => {
     })
     
     toast.success('Ticket cancelled successfully')
-    
-    // Refresh the tickets list
-    if (result.value) {
-      tickets.value = result.value.myTickets
-    }
   } catch (error) {
     toast.error('Failed to cancel ticket')
     console.error('Cancel ticket error:', error)
@@ -160,9 +168,7 @@ const cancelTicket = async (ticketId: string) => {
 }
 
 onMounted(() => {
-  if (result.value) {
-    tickets.value = result.value.myTickets
-  }
+  refetch();
 })
 </script>
 
