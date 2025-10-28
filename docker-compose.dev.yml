@@ -1,0 +1,85 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: eventflow-postgres
+    environment:
+      POSTGRES_DB: eventflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - eventflow-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eventflow-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/eventflow?schema=public
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-this-in-production
+      PORT: 4000
+      NODE_ENV: development
+      CORS_ORIGIN: http://localhost:3000
+      MAX_FILE_SIZE: 5242880
+      UPLOAD_DIR: ./uploads
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+    networks:
+      - eventflow-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    command: >
+      sh -c "
+        npx prisma generate &&
+        npx prisma migrate dev &&
+        npx prisma db seed &&
+        npm run dev
+      "
+
+  # Frontend Development (with hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: build
+    container_name: eventflow-frontend
+    environment:
+      VITE_GRAPHQL_URL: http://backend:4000/graphql
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/dist
+    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - backend
+    networks:
+      - eventflow-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+volumes:
+  postgres_data:
+    name: eventflow_postgres_data
+
+networks:
+  eventflow-network:
+    name: eventflow-network
+    driver: bridge
+

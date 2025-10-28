@@ -11,10 +11,14 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    host: '0.0.0.0',
+    port: 5173,
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       '/graphql': {
-        target: 'http://localhost:4000',
+        target: 'http://backend:4000',
         changeOrigin: true,
       },
     },

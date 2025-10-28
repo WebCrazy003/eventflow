@@ -73,7 +73,9 @@ services:
 
 volumes:
   postgres_data:
+    name: eventflow_postgres_data
 
 networks:
   eventflow-network:
+    name: eventflow-network
     driver: bridge
