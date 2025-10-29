@@ -416,7 +416,9 @@ const handleImageUpload = async (event: Event) => {
       method: 'POST',
       headers: {
         authorization: token ? `Bearer ${token}` : '',
+        // Don't set Content-Type - let browser set it with boundary for FormData
       },
+      credentials: 'include', // Include credentials for CORS
       body: formData,
     })
 

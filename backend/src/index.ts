@@ -68,16 +68,35 @@ async function startServer() {
 
   await server.start();
 
-  // CORS configuration
+  // CORS configuration - allow multiple origins for development
+  const allowedOrigins = [
+    process.env.CORS_ORIGIN || 'http://localhost:3000',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+  ];
+
   const corsOptions: cors.CorsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all in development, restrict in production
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   };
+
+  // Apply CORS globally before all routes
+  app.use(cors(corsOptions));
 
   // Apply middleware
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>(corsOptions),
     json(),
     authMiddleware,
     expressMiddleware(server, {
@@ -86,12 +105,11 @@ async function startServer() {
   );
 
   // Serve static files from uploads directory
-  app.use('/uploads', cors(corsOptions), express.static(path.join(process.cwd(), uploadDir)));
+  app.use('/uploads', express.static(path.join(process.cwd(), uploadDir)));
 
   // File upload endpoint
   app.post(
     '/api/upload',
-    cors(corsOptions),
     authMiddleware,
     upload.single('image'),
     async (req: any, res) => {

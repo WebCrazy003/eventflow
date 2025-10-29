@@ -11,3 +11,6 @@ build/
 
 # IDE and editor files
 .vscode/
+
+# Uploads
+backend/uploads/
