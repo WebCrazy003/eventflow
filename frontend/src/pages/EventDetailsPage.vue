@@ -199,7 +199,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery, useMutation, useSubscription } from '@vue/apollo-composable'
 import { EVENT_QUERY, BOOK_TICKET_MUTATION, EVENT_CAPACITY_CHANGED_SUBSCRIPTION } from '@/graphql/queries'
@@ -214,20 +214,39 @@ const toast = useToast()
 const booking = ref(false)
 const capacityInfo = ref<CapacityInfo | null>(null)
 
-const { result, loading } = useQuery(EVENT_QUERY, {
+const { result, loading, refetch } = useQuery(EVENT_QUERY, {
   id: route.params.id
 })
 
 const { mutate: bookTicketMutation } = useMutation(BOOK_TICKET_MUTATION)
 
 // Subscribe to capacity changes
-const { result: subscriptionResult } = useSubscription(EVENT_CAPACITY_CHANGED_SUBSCRIPTION, {
-  eventId: route.params.id
-})
+const { result: subscriptionResult, error: subscriptionError } = useSubscription(
+  EVENT_CAPACITY_CHANGED_SUBSCRIPTION,
+  computed(() => ({
+    eventId: route.params.id as string
+  })),
+  {
+    skip: computed(() => !route.params.id)
+  }
+)
+
+// Log subscription errors for debugging
+watch(subscriptionError, (error) => {
+  if (error) {
+    console.error('Subscription error:', error)
+    toast.error('Failed to connect to live updates')
+  }
+}, { immediate: true })
 
 const event = computed(() => result.value?.event)
 
 const remainingTickets = computed(() => {
+  // Use subscription data if available for live updates
+  if (capacityInfo.value?.remaining !== undefined) {
+    return capacityInfo.value.remaining
+  }
+  
   if (!event.value) return 0
   const bookedTickets = event.value.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0
   return event.value.capacity - bookedTickets
@@ -296,22 +315,33 @@ const bookTicket = async () => {
 }
 
 // Watch for subscription updates
-watch(subscriptionResult, (newResult) => {
-  if (newResult?.eventCapacityChanged) {
-    capacityInfo.value = newResult.eventCapacityChanged
-  }
-})
+watch(
+  () => subscriptionResult.value,
+  (newResult) => {
+    if (newResult?.eventCapacityChanged) {
+      const data = newResult.eventCapacityChanged
+      capacityInfo.value = data
+      toast.info(`Live update: ${data.remaining} tickets remaining!`, { timeout: 3000 })
+      
+      // Also refetch the event query to get latest data
+      if (refetch) {
+        refetch()
+      }
+    }
+  },
+  { deep: true, immediate: true }
+)
 
-onMounted(() => {
-  // Initialize capacity info
-  if (event.value) {
+// Watch for event data to initialize capacity info
+watch(event, (newEvent) => {
+  if (newEvent && !capacityInfo.value) {
     capacityInfo.value = {
-      eventId: event.value.id,
-      capacity: event.value.capacity,
-      remaining: remainingTickets.value,
-      booked: event.value.capacity - remainingTickets.value
+      eventId: newEvent.id,
+      capacity: newEvent.capacity,
+      remaining: newEvent.capacity - (newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0),
+      booked: newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0
     }
   }
-})
+}, { immediate: true })
 </script>
 

@@ -170,4 +170,9 @@ export const typeDefs = gql`
     deleteUser(userId: ID!): Boolean!
   }
 
+  type Subscription {
+    ticketBooked(eventId: ID!): Ticket!
+    eventCapacityChanged(eventId: ID!): CapacityInfo!
+  }
+
 `;

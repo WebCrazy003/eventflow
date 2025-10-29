@@ -150,6 +150,7 @@ export const eventResolvers = {
       }
 
       const updateData: any = {};
+      const capacityChanged = input.capacity !== undefined && input.capacity !== event.capacity;
 
       if (input.title !== undefined) updateData.title = input.title;
       if (input.description !== undefined) updateData.description = input.description;
@@ -168,14 +169,23 @@ export const eventResolvers = {
         data: updateData,
         include: {
           organizer: true,
-          tickets: true,
+          tickets: {
+            where: { status: 'CONFIRMED' },
+          },
         },
       });
 
-      // Publish event update
-      // context.pubSub.publish('EVENT_UPDATED', {
-      //   eventUpdated: updatedEvent,
-      // });
+      // Publish capacity change subscription if capacity was changed
+      if (capacityChanged) {
+        context.pubSub.publish('EVENT_CAPACITY_CHANGED', {
+          eventCapacityChanged: {
+            eventId: id,
+            capacity: updatedEvent.capacity,
+            remaining: updatedEvent.capacity - updatedEvent.tickets.length,
+            booked: updatedEvent.tickets.length,
+          },
+        });
+      }
 
       return updatedEvent;
     },

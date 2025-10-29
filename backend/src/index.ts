@@ -6,6 +6,8 @@ import http from 'http';
 import cors from 'cors';
 import { json } from 'body-parser';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/use/ws';
 import dotenv from 'dotenv';
 
 import { typeDefs } from './schema';
@@ -28,11 +30,37 @@ async function startServer() {
     resolvers,
   });
 
+  // Create WebSocket server for subscriptions
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql',
+  });
+
+  // Use the imported useServer
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: async (ctx: any) => {
+        return createContext(ctx.connectionParams || {});
+      },
+    },
+    wsServer
+  );
+
   // Create Apollo Server
   const server = new ApolloServer({
     schema,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
     ],
   });
 
@@ -59,14 +87,14 @@ async function startServer() {
 
   await new Promise<void>((resolve) => {
     httpServer.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
-      console.log(`🔌 WebSocket server ready at ws://localhost:${PORT}/graphql`);
+      console.log(`Server ready at http://localhost:${PORT}/graphql`);
+      console.log(`WebSocket server ready at ws://localhost:${PORT}/graphql`);
       resolve();
     });
   });
 }
 
 startServer().catch((error) => {
-  console.error('❌ Error starting server:', error);
+  console.error('Error starting server:', error);
   process.exit(1);
 });

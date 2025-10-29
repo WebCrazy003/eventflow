@@ -1,10 +1,23 @@
-import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client/core'
+import { ApolloClient, InMemoryCache, createHttpLink, from, split } from '@apollo/client/core'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { createClient } from 'graphql-ws'
+import { getMainDefinition } from '@apollo/client/utilities'
 
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql',
 })
+
+const wsLink = new GraphQLWsLink(createClient({
+  url: (import.meta.env.VITE_GRAPHQL_WS_URL || 'ws://localhost:4000/graphql'),
+  connectionParams: () => {
+    const token = localStorage.getItem('accessToken')
+    return {
+      authorization: token ? `Bearer ${token}` : '',
+    }
+  },
+}))
 
 // Auth link to add token to requests
 const authLink = setContext((_, { headers }) => {
@@ -96,8 +109,21 @@ async function refreshToken() {
   }
 }
 
-// Simple HTTP link with auth and error handling
-const link = from([errorLink, authLink, httpLink])
+// Split links based on operation type
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query)
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    )
+  },
+  wsLink,
+  from([errorLink, authLink, httpLink])
+)
+
+// Complete link with auth and error handling
+const link = splitLink
 
 export function createApolloClient() {
   return new ApolloClient({

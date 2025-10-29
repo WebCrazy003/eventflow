@@ -148,18 +148,18 @@ export const ticketResolvers = {
       });
 
       // Publish subscription updates
-      // context.pubSub.publish('TICKET_BOOKED', {
-      //   ticketBooked: result.ticket,
-      // });
+      context.pubSub.publish('TICKET_BOOKED', {
+        ticketBooked: result.ticket,
+      });
 
-      // context.pubSub.publish('EVENT_CAPACITY_CHANGED', {
-      //   eventCapacityChanged: {
-      //     eventId,
-      //     capacity: result.updatedEvent!.capacity,
-      //     remaining: result.updatedEvent!.capacity - result.updatedEvent!.tickets.length,
-      //     booked: result.updatedEvent!.tickets.length,
-      //   },
-      // });
+      context.pubSub.publish('EVENT_CAPACITY_CHANGED', {
+        eventCapacityChanged: {
+          eventId,
+          capacity: result.updatedEvent!.capacity,
+          remaining: result.updatedEvent!.capacity - result.updatedEvent!.tickets.length,
+          booked: result.updatedEvent!.tickets.length,
+        },
+      });
 
       return result.ticket;
     },
@@ -221,14 +221,14 @@ export const ticketResolvers = {
       });
 
       // Publish subscription updates
-      // context.pubSub.publish('EVENT_CAPACITY_CHANGED', {
-      //   eventCapacityChanged: {
-      //     eventId: ticket.eventId,
-      //     capacity: updatedEvent!.capacity,
-      //     remaining: updatedEvent!.capacity - updatedEvent!.tickets.length,
-      //     booked: updatedEvent!.tickets.length,
-      //   },
-      // });
+      context.pubSub.publish('EVENT_CAPACITY_CHANGED', {
+        eventCapacityChanged: {
+          eventId: ticket.eventId,
+          capacity: updatedEvent!.capacity,
+          remaining: updatedEvent!.capacity - updatedEvent!.tickets.length,
+          booked: updatedEvent!.tickets.length,
+        },
+      });
 
       return cancelledTicket;
     },
