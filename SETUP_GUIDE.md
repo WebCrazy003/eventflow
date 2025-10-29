@@ -1,5 +1,3 @@
-# EventFlow - Simplified Setup Guide
-
 ## Overview
 This guide provides detailed steps to run the simplified EventFlow application.
 
@@ -39,34 +37,3 @@ This will:
 
 - **Frontend**: http://localhost:3000
 - **GraphQL API**: http://localhost:4000/graphql
-
-## Demo Credentials
-
-After the database is seeded, you can log in with:
-
-- **Admin**: `admin@eventflow.com` / `admin123`
-- **Organizer**: `organizer@eventflow.com` / `organizer123`
-- **User**: `user@eventflow.com` / `user123`
-
-
-## Manual Development Setup (Without Docker)
-
-### Backend Setup
-```bash
-cd backend
-npm install
-npx prisma generate
-npx prisma migrate dev
-npx prisma db seed
-npm run dev
-```
-
-### Frontend Setup (in a new terminal)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Database Setup
-You'll need to set up PostgreSQL manually and update the `DATABASE_URL` in your `.env` file.

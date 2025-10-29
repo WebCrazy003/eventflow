@@ -1,4 +1,4 @@
-## 🏗️ Architecture
+## Architecture
 
 ### Backend (Node.js + TypeScript)
 - **Apollo Server**: GraphQL API server
@@ -29,7 +29,7 @@ npx prisma generate        # Generate client
 npx prisma db seed         # Seed database
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Backend Tests
 ```bash
@@ -43,14 +43,14 @@ cd frontend
 npm test
 ```
 
-## 🔐 Authentication
+## Authentication
 
 ### User Roles
 - **USER**: Can book tickets and view events
 - **ORGANIZER**: Can create and manage events
 - **ADMIN**: Full system access
 
-## 🎉 Demo Credentials
+## Demo Credentials
 
 After seeding the database:
 
