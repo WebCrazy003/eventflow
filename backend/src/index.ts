@@ -9,11 +9,13 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/use/ws';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
 import { createContext } from './context';
 import { authMiddleware } from './auth/middleware';
+import { upload, uploadDir } from './utils/upload';
 
 // Load environment variables
 dotenv.config();
@@ -66,18 +68,44 @@ async function startServer() {
 
   await server.start();
 
+  // CORS configuration
+  const corsOptions: cors.CorsOptions = {
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    credentials: true,
+  };
+
   // Apply middleware
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>({
-      origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-      credentials: true,
-    }),
+    cors<cors.CorsRequest>(corsOptions),
     json(),
     authMiddleware,
     expressMiddleware(server, {
       context: async ({ req }) => createContext(req),
     })
+  );
+
+  // Serve static files from uploads directory
+  app.use('/uploads', cors(corsOptions), express.static(path.join(process.cwd(), uploadDir)));
+
+  // File upload endpoint
+  app.post(
+    '/api/upload',
+    cors(corsOptions),
+    authMiddleware,
+    upload.single('image'),
+    async (req: any, res) => {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+      res.json({
+        url: fileUrl,
+        filename: req.file.filename,
+        path: req.file.path,
+      });
+    }
   );
 
   // Health check endpoint

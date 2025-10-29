@@ -22,8 +22,11 @@ export interface User {
 }
 
 export interface EventImage {
+  id?: string
   url: string
   alt?: string
+  filename?: string
+  path?: string
 }
 
 export interface Event {

@@ -19,14 +19,14 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Event Header -->
       <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-        <!-- <div v-if="event.images.length > 0" class="h-64 md:h-96 bg-gray-200">
+        <div v-if="event.images && event.images.length > 0" class="h-64 md:h-96 bg-gray-200">
           <img
-            :src="event.images[0].url"
+            :src="getImageUrl(event.images[0].url)"
             :alt="event.images[0].alt || event.title"
             class="w-full h-full object-cover"
           />
-        </div> -->
-        <div class="h-64 md:h-96 bg-gray-200 flex items-center justify-center">
+        </div>
+        <div v-else class="h-64 md:h-96 bg-gray-200 flex items-center justify-center">
           <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
           </svg>
@@ -178,22 +178,23 @@
       </div>
 
       <!-- Event Images -->
-      <!-- <div v-if="event.images.length > 1" class="bg-white rounded-lg shadow-md p-6">
+      <div v-if="event.images && event.images.length > 1" class="bg-white rounded-lg shadow-md p-6">
         <h2 class="text-xl font-semibold mb-4">Event Images</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div
             v-for="image in event.images.slice(1)"
             :key="image.id"
-            class="aspect-square bg-gray-200 rounded-lg overflow-hidden"
+            class="aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+            @click="openImageModal(image)"
           >
             <img
-              :src="image.url"
+              :src="getImageUrl(image.url)"
               :alt="image.alt || event.title"
               class="w-full h-full object-cover"
             />
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
@@ -287,6 +288,17 @@ const formatDate = (dateString: string) => {
 
 const isEventPast = (startAt: string) => {
   return new Date(startAt) < new Date()
+}
+
+const getImageUrl = (url: string) => {
+  if (url.startsWith('http')) return url
+  const API_BASE_URL = (import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql').replace('/graphql', '')
+  return `${API_BASE_URL}${url}`
+}
+
+const openImageModal = (image: any) => {
+  // Simple image viewer - could be enhanced with a proper modal component
+  window.open(getImageUrl(image.url), '_blank')
 }
 
 const bookTicket = async () => {

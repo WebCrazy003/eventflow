@@ -40,6 +40,7 @@ export const eventResolvers = {
         include: {
           organizer: true,
           tickets: true,
+          images: true,
         },
         orderBy: { startAt: 'asc' },
         take: first + 1,
@@ -77,6 +78,7 @@ export const eventResolvers = {
               user: true,
             },
           },
+          images: true,
         },
       });
 
@@ -118,6 +120,7 @@ export const eventResolvers = {
         include: {
           organizer: true,
           tickets: true,
+          images: true,
         },
       });
 
@@ -172,6 +175,7 @@ export const eventResolvers = {
           tickets: {
             where: { status: 'CONFIRMED' },
           },
+          images: true,
         },
       });
 

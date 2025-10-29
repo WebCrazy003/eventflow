@@ -157,6 +157,52 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
+            
+            <!-- Event Images -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Event Images</label>
+              
+              <!-- Current Images -->
+              <div v-if="eventImages.length > 0" class="grid grid-cols-3 gap-2 mb-3">
+                <div
+                  v-for="image in eventImages"
+                  :key="image.id || image.url"
+                  class="relative group"
+                >
+                  <img
+                    :src="getImageUrl(image.url)"
+                    :alt="image.alt || 'Event image'"
+                    class="w-full h-24 object-cover rounded-md border border-gray-300"
+                  />
+                  <button
+                    @click="removeImage(image)"
+                    class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                    type="button"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Upload Button -->
+              <div>
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  @change="handleImageUpload"
+                  class="hidden"
+                />
+                  <button
+                    @click="triggerFileInput"
+                    type="button"
+                    :disabled="uploadingImage"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    {{ uploadingImage ? 'Uploading...' : 'Add Image' }}
+                  </button>
+              </div>
+            </div>
           </div>
         </form>
       </template>
@@ -185,10 +231,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { EVENTS_QUERY, CREATE_EVENT_MUTATION, UPDATE_EVENT_MUTATION, DELETE_EVENT_MUTATION } from '@/graphql/queries'
+import { EVENTS_QUERY, CREATE_EVENT_MUTATION, UPDATE_EVENT_MUTATION, DELETE_EVENT_MUTATION, ADD_EVENT_IMAGE_MUTATION, REMOVE_EVENT_IMAGE_MUTATION } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import type { Event, CreateEventInput } from '@/types'
+import type { Event, CreateEventInput, EventImage } from '@/types'
 import StatCard from '@/components/StatCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -201,6 +247,9 @@ const toast = useToast()
 const showEventModal = ref(false)
 const isSaving = ref(false)
 const editingEvent = ref<Event | null>(null)
+const eventImages = ref<(EventImage & { id?: string })[]>([])
+const fileInput = ref<HTMLInputElement | null>(null)
+const uploadingImage = ref(false)
 
 // Computed properties for modal behavior
 const isEditMode = computed(() => editingEvent.value !== null)
@@ -224,6 +273,11 @@ const { result, loading, refetch } = useQuery(EVENTS_QUERY, {
 const { mutate: createEventMutation } = useMutation(CREATE_EVENT_MUTATION)
 const { mutate: updateEventMutation } = useMutation(UPDATE_EVENT_MUTATION)
 const { mutate: deleteEventMutation } = useMutation(DELETE_EVENT_MUTATION)
+const { mutate: addEventImageMutation } = useMutation(ADD_EVENT_IMAGE_MUTATION)
+const { mutate: removeEventImageMutation } = useMutation(REMOVE_EVENT_IMAGE_MUTATION)
+
+const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql'
+const API_BASE_URL = GRAPHQL_URL.replace('/graphql', '')
 
 const events = computed(() => {
   return result.value?.events.edges.map((edge: any) => edge.node) || []
@@ -267,6 +321,7 @@ const resetForm = () => {
     capacity: 100,
   }
   editingEvent.value = null
+  eventImages.value = []
 }
 
 const openCreateModal = () => {
@@ -291,13 +346,24 @@ const createEvent = async () => {
   isSaving.value = true
   
   try {
-    await createEventMutation({
+    const result = await createEventMutation({
       input: {
         ...newEvent.value,
         startAt: new Date(newEvent.value.startAt).toISOString(),
         endAt: new Date(newEvent.value.endAt).toISOString(),
       }
     })
+    
+    // Add images after event is created
+    if (eventImages.value.length > 0 && result?.data?.createEvent?.id) {
+      for (const image of eventImages.value) {
+        await addEventImageMutation({
+          eventId: result.data.createEvent.id,
+          url: image.url,
+          alt: image.alt,
+        })
+      }
+    }
     
     toast.success('Event created successfully!')
     showEventModal.value = false
@@ -321,7 +387,89 @@ const editEvent = (event: Event) => {
     endAt: new Date(event.endAt).toISOString().slice(0, 16),
     capacity: event.capacity,
   }
+  eventImages.value = event.images ? [...event.images] : []
   showEventModal.value = true
+}
+
+const getImageUrl = (url: string) => {
+  if (url.startsWith('http')) return url
+  return `${API_BASE_URL}${url}`
+}
+
+const triggerFileInput = () => {
+  fileInput.value?.click()
+}
+
+const handleImageUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  uploadingImage.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const token = localStorage.getItem('accessToken')
+    const response = await fetch(`${API_BASE_URL}/api/upload`, {
+      method: 'POST',
+      headers: {
+        authorization: token ? `Bearer ${token}` : '',
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error('Upload failed')
+    }
+
+    const data = await response.json()
+
+    // If editing existing event, add image to database immediately
+    if (isEditMode.value && editingEvent.value) {
+      await addEventImageMutation({
+        eventId: editingEvent.value.id,
+        url: data.url,
+        alt: file.name,
+      })
+      await refetch()
+    } else {
+      // For new events, store locally until event is created
+      eventImages.value.push({
+        url: data.url,
+        alt: file.name,
+        filename: data.filename,
+        path: data.path,
+      })
+    }
+
+    toast.success('Image uploaded successfully!')
+  } catch (error) {
+    toast.error('Failed to upload image')
+    console.error('Upload error:', error)
+  } finally {
+    uploadingImage.value = false
+    if (target) target.value = ''
+  }
+}
+
+const removeImage = async (image: EventImage & { id?: string }) => {
+  // If image has an id, it's in the database - remove it
+  if (image.id && isEditMode.value && editingEvent.value) {
+    try {
+      await removeEventImageMutation({ id: image.id })
+      eventImages.value = eventImages.value.filter(img => img.id !== image.id)
+      toast.success('Image removed successfully!')
+      await refetch()
+    } catch (error) {
+      toast.error('Failed to remove image')
+      console.error('Remove image error:', error)
+    }
+  } else {
+    // Remove from local array (not yet saved)
+    eventImages.value = eventImages.value.filter(img => img.url !== image.url)
+  }
 }
 
 const updateEvent = async () => {

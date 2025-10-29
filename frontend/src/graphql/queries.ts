@@ -80,6 +80,11 @@ export const EVENTS_QUERY = gql`
             id
             status
           }
+          images {
+            id
+            url
+            alt
+          }
         }
         cursor
       }
@@ -120,6 +125,11 @@ export const EVENT_QUERY = gql`
           email
         }
       }
+      images {
+        id
+        url
+        alt
+      }
     }
   }
 `
@@ -138,6 +148,11 @@ export const CREATE_EVENT_MUTATION = gql`
         id
         name
       }
+      images {
+        id
+        url
+        alt
+      }
     }
   }
 `
@@ -152,7 +167,28 @@ export const UPDATE_EVENT_MUTATION = gql`
       startAt
       endAt
       capacity
+      images {
+        id
+        url
+        alt
+      }
     }
+  }
+`
+
+export const ADD_EVENT_IMAGE_MUTATION = gql`
+  mutation AddEventImage($eventId: ID!, $url: String!, $alt: String) {
+    addEventImage(eventId: $eventId, url: $url, alt: $alt) {
+      id
+      url
+      alt
+    }
+  }
+`
+
+export const REMOVE_EVENT_IMAGE_MUTATION = gql`
+  mutation RemoveEventImage($id: ID!) {
+    removeEventImage(id: $id)
   }
 `
 

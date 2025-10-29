@@ -26,6 +26,17 @@ export const typeDefs = gql`
     updatedAt: DateTime!
   }
 
+  type EventImage {
+    id: ID!
+    eventId: ID!
+    filename: String!
+    path: String!
+    url: String!
+    alt: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
   type Event {
     id: ID!
     title: String!
@@ -37,6 +48,7 @@ export const typeDefs = gql`
     organizer: User!
     organizerId: ID!
     tickets: [Ticket!]!
+    images: [EventImage!]!
     createdAt: DateTime!
     updatedAt: DateTime!
   }
@@ -159,6 +171,10 @@ export const typeDefs = gql`
     createEvent(input: CreateEventInput!): Event!
     updateEvent(id: ID!, input: UpdateEventInput!): Event!
     deleteEvent(id: ID!): Boolean!
+    
+    # Event image management
+    addEventImage(eventId: ID!, url: String!, alt: String): EventImage!
+    removeEventImage(id: ID!): Boolean!
 
     # Ticket management
     bookTicket(eventId: ID!, type: String): Ticket!

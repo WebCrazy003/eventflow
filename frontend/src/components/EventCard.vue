@@ -2,7 +2,7 @@
   <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
     <div v-if="showImage && event.images && event.images.length > 0" class="h-48 bg-gray-200">
       <img
-        :src="event.images[0].url"
+        :src="getImageUrl(event.images[0].url)"
         :alt="event.images[0].alt || event.title"
         class="w-full h-full object-cover"
       />
@@ -91,6 +91,12 @@ const formatDate = (dateString: string) => {
 
 const getBookedCount = (event: Event) => {
   return event.tickets?.filter(ticket => ticket.status === 'CONFIRMED').length || 0
+}
+
+const getImageUrl = (url: string) => {
+  if (url.startsWith('http')) return url
+  const API_BASE_URL = (import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql').replace('/graphql', '')
+  return `${API_BASE_URL}${url}`
 }
 </script>
 

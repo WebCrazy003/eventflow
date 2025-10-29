@@ -42,6 +42,7 @@
             v-for="event in events"
             :key="event.id"
             :event="event"
+            :show-image="true"
             :show-location="true"
             :show-capacity="true"
             :show-organizer="true"
