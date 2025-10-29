@@ -302,9 +302,20 @@ const bookTicket = async () => {
     
     toast.success('Ticket booked successfully!')
     
-    // Refresh the event data
-    if (result.value) {
-      // The subscription will handle the capacity update
+    // Immediately update local capacity info for snappy UX
+    if (capacityInfo.value) {
+      const newRemaining = Math.max(0, (capacityInfo.value.remaining ?? 0) - 1)
+      const newBooked = (capacityInfo.value.booked ?? 0) + 1
+      capacityInfo.value = {
+        ...capacityInfo.value,
+        remaining: newRemaining,
+        booked: newBooked
+      }
+    }
+
+    // Also refetch the event query to stay consistent with server state
+    if (refetch) {
+      refetch()
     }
   } catch (error) {
     toast.error('Failed to book ticket')
