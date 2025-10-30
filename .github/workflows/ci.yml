@@ -65,7 +65,7 @@ jobs:
           DATABASE_URL: ${{ env.POSTGRES_DB_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-        run: npm test -- --run
+        run: npm test
 
       - name: Install frontend deps
         working-directory: frontend
