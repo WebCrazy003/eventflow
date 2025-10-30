@@ -261,7 +261,7 @@ import {
 } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import type { CapacityInfo } from '@/types'
+import type { CapacityInfo, Ticket } from '@/types'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -309,7 +309,7 @@ const remainingTickets = computed(() => {
 
   if (!event.value) return 0
   const bookedTickets =
-    event.value.tickets?.filter(ticket => ticket.status === 'CONFIRMED').length || 0
+    event.value.tickets?.filter((ticket: Ticket) => ticket.status === 'CONFIRMED').length || 0
   return event.value.capacity - bookedTickets
 })
 
@@ -318,7 +318,7 @@ const canBookTicket = computed(() => {
 
   // Check if user already has a ticket
   const userTicket = event.value.tickets?.find(
-    ticket => ticket?.user?.id === authStore.user?.id && ticket.status === 'CONFIRMED'
+    (ticket: Ticket) => ticket?.user?.id === authStore.user?.id && ticket.status === 'CONFIRMED'
   )
 
   return !userTicket && remainingTickets.value > 0 && !isEventPast(event.value.startAt)
@@ -328,7 +328,7 @@ const attendees = computed(() => {
   if (!event.value?.tickets) return []
   // Show all tickets (including cancelled/refunded for transparency)
   // You can filter to only CONFIRMED if you want only confirmed attendees
-  return event.value.tickets.filter(ticket => ticket.status === 'CONFIRMED')
+  return event.value.tickets.filter((ticket: Ticket) => ticket.status === 'CONFIRMED')
 })
 
 const isOrganizer = computed(() => {
@@ -426,8 +426,8 @@ watch(
         eventId: newEvent.id,
         capacity: newEvent.capacity,
         remaining:
-          newEvent.capacity - (newEvent.tickets?.filter(t => t.status === 'CONFIRMED').length || 0),
-        booked: newEvent.tickets?.filter(t => t.status === 'CONFIRMED').length || 0,
+          newEvent.capacity - (newEvent.tickets?.filter((t: Ticket) => t.status === 'CONFIRMED').length || 0),
+        booked: newEvent.tickets?.filter((t: Ticket) => t.status === 'CONFIRMED').length || 0,
       }
     }
   },
