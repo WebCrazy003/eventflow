@@ -10,14 +10,14 @@
           to="/events"
           class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
         >
-          Browse Events11
+          Browse Events
         </router-link>
         <router-link
           v-if="!authStore.isAuthenticated"
           to="/register"
           class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
         >
-          Get Started22
+          Get Started
         </router-link>
       </template>
     </HeroSection>
