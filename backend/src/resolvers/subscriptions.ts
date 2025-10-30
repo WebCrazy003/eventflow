@@ -6,17 +6,15 @@ export const subscriptionResolvers = {
   Subscription: {
     ticketBooked: {
       subscribe: withFilter(
-        () => {
-          return pubSub.asyncIterator('TICKET_BOOKED')
-        },
-        (
-          payload: { ticketBooked?: { event?: { id?: string } } },
+        () => (pubSub as any).asyncIterator('TICKET_BOOKED'),
+        ((
+          payload: { ticketBooked?: { event?: { id?: string } } } | undefined,
           _root: unknown,
-          args?: { eventId?: string }
+          args: { eventId: string }
         ) => {
-          if (!args?.eventId) return false
-          return payload.ticketBooked?.event?.id === args.eventId
-        }
+          if (!args.eventId) return false
+          return payload?.ticketBooked?.event?.id === args.eventId
+        }) as any
       ),
       resolve: (payload: { ticketBooked: unknown }) => {
         return payload.ticketBooked
@@ -24,36 +22,24 @@ export const subscriptionResolvers = {
     },
     eventCapacityChanged: {
       subscribe: withFilter(
-        (_parent: unknown, _args: { eventId?: string }, _context: { user?: AuthUser }) => {
-          console.log(
-            '=======================Subscription: listening for EVENT_CAPACITY_CHANGED, args:',
-            _args,
-            'context:',
-            _context?.user?.id
-          )
-          return pubSub.asyncIterator('EVENT_CAPACITY_CHANGED')
-        },
-        (
-          payload: {
-            eventCapacityChanged?: {
-              eventId?: string
-              capacity?: number
-              remaining?: number
-              booked?: number
-            }
-          },
-          args: { eventId?: string },
-          context?: { user?: AuthUser }
+        () => (pubSub as any).asyncIterator('EVENT_CAPACITY_CHANGED'),
+        ((
+          payload:
+            | {
+                eventCapacityChanged?: {
+                  eventId?: string
+                  capacity?: number
+                  remaining?: number
+                  booked?: number
+                }
+              }
+            | undefined,
+          args: { eventId: string },
+          _context: { user?: AuthUser }
         ) => {
-          console.log('=======================Subscription filter:', {
-            payload: payload.eventCapacityChanged,
-            argsEventId: args?.eventId,
-            matching: payload.eventCapacityChanged?.eventId === args?.eventId,
-            contextUserId: context?.user?.id,
-          })
-          if (!args?.eventId) return false
-          return payload.eventCapacityChanged?.eventId === args.eventId
-        }
+          if (!args.eventId) return false
+          return payload?.eventCapacityChanged?.eventId === args.eventId
+        }) as any
       ),
       resolve: (payload: {
         eventCapacityChanged: {

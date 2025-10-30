@@ -43,7 +43,7 @@ async function startServer() {
     {
       schema,
       context: async (ctx: { connectionParams?: { authorization?: string } }) => {
-        return createContext(ctx.connectionParams || {})
+        return createContext({ connectionParams: ctx.connectionParams })
       },
     },
     wsServer
