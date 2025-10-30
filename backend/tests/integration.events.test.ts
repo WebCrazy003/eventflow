@@ -22,6 +22,8 @@ describe('Integration: Event creation + listing', () => {
 
   beforeAll(async () => {
     await prisma.$connect()
+    process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret'
+    process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh'
   })
 
   afterAll(async () => {
@@ -36,7 +38,7 @@ describe('Integration: Event creation + listing', () => {
     const organizer = await prisma.user.create({
       data: {
         name: 'Org',
-        email: 'org@example.com',
+        email: `org-${Date.now()}@example.com`,
         password: await hashPassword('pw'),
         roles: [Role.ORGANIZER],
       },

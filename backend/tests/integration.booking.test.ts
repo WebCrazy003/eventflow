@@ -23,6 +23,8 @@ describe('Integration: Booking + Capacity enforcement', () => {
 
   beforeAll(async () => {
     await prisma.$connect()
+    process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret'
+    process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh'
   })
 
   afterAll(async () => {
@@ -37,7 +39,7 @@ describe('Integration: Booking + Capacity enforcement', () => {
     const organizer = await prisma.user.create({
       data: {
         name: 'Org',
-        email: 'org@example.com',
+        email: `org-${Date.now()}@example.com`,
         password: await hashPassword('pw'),
         roles: [Role.ORGANIZER],
       },
@@ -45,7 +47,7 @@ describe('Integration: Booking + Capacity enforcement', () => {
     const user1 = await prisma.user.create({
       data: {
         name: 'User 1',
-        email: 'u1@example.com',
+        email: `u1-${Date.now()}@example.com`,
         password: await hashPassword('pw'),
         roles: [Role.USER],
       },
@@ -53,7 +55,7 @@ describe('Integration: Booking + Capacity enforcement', () => {
     const user2 = await prisma.user.create({
       data: {
         name: 'User 2',
-        email: 'u2@example.com',
+        email: `u2-${Date.now()}@example.com`,
         password: await hashPassword('pw'),
         roles: [Role.USER],
       },

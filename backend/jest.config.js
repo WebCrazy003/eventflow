@@ -14,4 +14,5 @@ module.exports = {
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  maxWorkers: 1,
 }
