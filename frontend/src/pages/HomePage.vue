@@ -145,15 +145,20 @@ const authStore = useAuthStore()
 const events = ref<Event[]>([])
 // const loading = ref(true)
 
-const { result } = useQuery(EVENTS_QUERY, {
+const { onResult, refetch } = useQuery(EVENTS_QUERY, {
   filter: {},
   pagination: { first: 6 },
 })
 
-onMounted(() => {
-  if (result.value) {
-    events.value = result.value.events.edges.map((edge: any) => edge.node)
-    // loading.value = false
+const onFetchComplete = (result: any) => {
+  if (result?.data?.events) {
+    const { edges: eventArray } = result?.data?.events
+    events.value = eventArray.map((edge: any) => edge.node)
   }
+}
+onResult(onFetchComplete)
+
+onMounted(() => {
+  refetch()
 })
 </script>
