@@ -42,7 +42,7 @@ async function startServer() {
   const serverCleanup = useServer(
     {
       schema,
-      context: async (ctx: any) => {
+      context: async (ctx: { connectionParams?: { authorization?: string } }) => {
         return createContext(ctx.connectionParams || {})
       },
     },
@@ -108,18 +108,26 @@ async function startServer() {
   app.use('/uploads', express.static(path.join(process.cwd(), uploadDir)))
 
   // File upload endpoint
-  app.post('/api/upload', authMiddleware, upload.single('image'), async (req: any, res) => {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' })
-    }
+  app.post(
+    '/api/upload',
+    authMiddleware,
+    upload.single('image'),
+    async (
+      req: import('express').Request & { file?: Express.Multer.File },
+      res: import('express').Response
+    ) => {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' })
+      }
 
-    const fileUrl = `/uploads/${req.file.filename}`
-    return res.json({
-      url: fileUrl,
-      filename: req.file.filename,
-      path: req.file.path,
-    })
-  })
+      const fileUrl = `/uploads/${req.file.filename}`
+      return res.json({
+        url: fileUrl,
+        filename: req.file.filename,
+        path: req.file.path,
+      })
+    }
+  )
 
   // Health check endpoint
   app.get('/health', (req, res) => {

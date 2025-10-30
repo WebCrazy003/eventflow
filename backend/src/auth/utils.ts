@@ -1,9 +1,15 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import { User, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 
 export interface TokenPayload {
   userId: string
+  email: string
+  roles: Role[]
+}
+
+export interface AuthUser {
+  id: string
   email: string
   roles: Role[]
 }
@@ -48,13 +54,13 @@ export function hasRole(userRoles: Role[], requiredRoles: Role[]): boolean {
   return requiredRoles.some(role => userRoles.includes(role))
 }
 
-export function requireAuth(user: any): void {
+export function requireAuth(user: AuthUser | undefined): void {
   if (!user) {
     throw new Error('Authentication required')
   }
 }
 
-export function requireRole(user: any, roles: Role[]): void {
+export function requireRole(user: AuthUser | undefined, roles: Role[]): void {
   requireAuth(user)
 
   if (!hasRole(user.roles, roles)) {

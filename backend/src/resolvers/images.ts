@@ -6,7 +6,7 @@ import fs from 'fs'
 export const imageResolvers = {
   Mutation: {
     addEventImage: async (
-      _: any,
+      _: unknown,
       { eventId, url, alt }: { eventId: string; url: string; alt?: string },
       context: Context
     ) => {
@@ -48,7 +48,7 @@ export const imageResolvers = {
       return image
     },
 
-    removeEventImage: async (_: any, { id }: { id: string }, context: Context) => {
+    removeEventImage: async (_: unknown, { id }: { id: string }, context: Context) => {
       requireAuth(context.user)
       requireRole(context.user, [Role.ORGANIZER, Role.ADMIN])
 

@@ -6,14 +6,16 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
   requireAuth,
-  requireRole,
   TokenPayload,
 } from '../auth/utils'
 import { Role } from '@prisma/client'
 
+type RegisterInput = { name: string; email: string; password: string }
+type LoginInput = { email: string; password: string }
+
 export const authResolvers = {
   Query: {
-    me: async (_: any, __: any, context: Context) => {
+    me: async (_: unknown, __: unknown, context: Context) => {
       requireAuth(context.user)
 
       const user = await context.prisma.user.findUnique({
@@ -37,7 +39,7 @@ export const authResolvers = {
   },
 
   Mutation: {
-    register: async (_: any, { input }: { input: any }, context: Context) => {
+    register: async (_: unknown, { input }: { input: RegisterInput }, context: Context) => {
       const { name, email, password } = input
 
       // Check if user already exists
@@ -80,7 +82,7 @@ export const authResolvers = {
       }
     },
 
-    login: async (_: any, { input }: { input: any }, context: Context) => {
+    login: async (_: unknown, { input }: { input: LoginInput }, context: Context) => {
       const { email, password } = input
 
       // Find user
@@ -116,7 +118,11 @@ export const authResolvers = {
       }
     },
 
-    refreshToken: async (_: any, { refreshToken }: { refreshToken: string }, context: Context) => {
+    refreshToken: async (
+      _: unknown,
+      { refreshToken }: { refreshToken: string },
+      context: Context
+    ) => {
       const payload = verifyRefreshToken(refreshToken)
 
       if (!payload) {

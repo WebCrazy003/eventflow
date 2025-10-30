@@ -3,19 +3,20 @@ import jwt from 'jsonwebtoken'
 import { Request } from 'express'
 import { EventEmitter } from 'events'
 import { PubSubEngine } from 'graphql-subscriptions'
+import type { TokenPayload, AuthUser } from './auth/utils'
 
 class EventEmitterPubSub extends EventEmitter implements PubSubEngine {
-  publish(triggerName: string, payload: any): Promise<void> {
+  publish(triggerName: string, payload: unknown): Promise<void> {
     this.emit(triggerName, payload)
     return Promise.resolve()
   }
 
-  async subscribe(triggerName: string, onMessage: (...args: any[]) => void): Promise<number> {
-    this.on(triggerName, onMessage)
+  async subscribe(triggerName: string, onMessage: (payload: unknown) => void): Promise<number> {
+    this.on(triggerName, onMessage as (...args: unknown[]) => void)
     return Promise.resolve(Math.random())
   }
 
-  async unsubscribe(subId: number): Promise<void> {
+  async unsubscribe(_subId: number): Promise<void> {
     // Simple implementation - in production you'd track subscriptions
     return Promise.resolve()
   }
@@ -26,8 +27,8 @@ class EventEmitterPubSub extends EventEmitter implements PubSubEngine {
     return triggerIterator
   }
 
-  asyncIterableIterator<T>(triggers: string | string[]): any {
-    return this.asyncIterator<T>(triggers)
+  asyncIterableIterator<T>(triggers: string | string[]): AsyncIterableIterator<T> {
+    return this.asyncIterator<T>(triggers) as AsyncIterableIterator<T>
   }
 }
 
@@ -71,7 +72,7 @@ class TriggerIterator<T> implements AsyncIterator<T> {
   async return(): Promise<IteratorResult<T>> {
     this.listening = false
     this.eventHandlers.forEach(unsubscribe => unsubscribe())
-    return { value: undefined as any, done: true }
+    return { value: undefined as unknown as T, done: true }
   }
 
   async throw(error: Error): Promise<IteratorResult<T>> {
@@ -107,22 +108,26 @@ export interface Context {
   }
 }
 
-export function createContext(req: Request | any): Context {
+type ConnectionParams = { connectionParams?: { authorization?: string } }
+
+export function createContext(req: Request | ConnectionParams): Context {
   const prisma = getPrismaClient()
 
-  let user: Context['user'] = undefined
+  let user: AuthUser | undefined = undefined
 
   // Extract token from Authorization header
-  const authHeader = req.headers?.authorization || req.connectionParams?.authorization
+  const authHeader =
+    (req as Request).headers?.authorization ||
+    (req as ConnectionParams).connectionParams?.authorization
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7)
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload
       user = {
         id: decoded.userId,
         email: decoded.email,
-        roles: decoded.roles || [],
+        roles: decoded.roles,
       }
     } catch (error) {
       console.log('Invalid token:', error)
@@ -131,7 +136,7 @@ export function createContext(req: Request | any): Context {
 
   return {
     prisma,
-    pubSub: pubSub as any,
+    pubSub,
     user,
   }
 }

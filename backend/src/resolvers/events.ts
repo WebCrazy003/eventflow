@@ -1,17 +1,30 @@
 import { Context } from '../context'
 import { requireAuth, requireRole } from '../auth/utils'
-import { Role } from '@prisma/client'
+import { Role, Prisma } from '@prisma/client'
+
+type EventFilter = {
+  search?: string
+  location?: string
+  startDate?: string
+  endDate?: string
+  organizerId?: string
+}
+
+type Pagination = {
+  first?: number
+  after?: string
+}
 
 export const eventResolvers = {
   Query: {
     events: async (
-      _: any,
-      { filter, pagination }: { filter?: any; pagination?: any },
+      _: unknown,
+      { filter, pagination }: { filter?: EventFilter; pagination?: Pagination },
       context: Context
     ) => {
       const { first = 10, after } = pagination || {}
 
-      const where: any = {}
+      const where: Prisma.EventWhereInput = {}
 
       if (filter) {
         if (filter.search) {
@@ -72,7 +85,7 @@ export const eventResolvers = {
       }
     },
 
-    event: async (_: any, { id }: { id: string }, context: Context) => {
+    event: async (_: unknown, { id }: { id: string }, context: Context) => {
       const event = await context.prisma.event.findUnique({
         where: { id },
         include: {
@@ -95,7 +108,22 @@ export const eventResolvers = {
   },
 
   Mutation: {
-    createEvent: async (_: any, { input }: { input: any }, context: Context) => {
+    createEvent: async (
+      _: unknown,
+      {
+        input,
+      }: {
+        input: {
+          title: string
+          description: string
+          location: string
+          startAt: string
+          endAt: string
+          capacity: number
+        }
+      },
+      context: Context
+    ) => {
       requireAuth(context.user)
       requireRole(context.user, [Role.ORGANIZER, Role.ADMIN])
 
@@ -136,7 +164,24 @@ export const eventResolvers = {
       return event
     },
 
-    updateEvent: async (_: any, { id, input }: { id: string; input: any }, context: Context) => {
+    updateEvent: async (
+      _: unknown,
+      {
+        id,
+        input,
+      }: {
+        id: string
+        input: Partial<{
+          title: string
+          description: string
+          location: string
+          startAt: string
+          endAt: string
+          capacity: number
+        }>
+      },
+      context: Context
+    ) => {
       requireAuth(context.user)
 
       const event = await context.prisma.event.findUnique({
@@ -156,7 +201,7 @@ export const eventResolvers = {
         throw new Error('You can only edit your own events')
       }
 
-      const updateData: any = {}
+      const updateData: Prisma.EventUpdateInput = {}
       const capacityChanged = input.capacity !== undefined && input.capacity !== event.capacity
 
       if (input.title !== undefined) updateData.title = input.title
@@ -198,7 +243,7 @@ export const eventResolvers = {
       return updatedEvent
     },
 
-    deleteEvent: async (_: any, { id }: { id: string }, context: Context) => {
+    deleteEvent: async (_: unknown, { id }: { id: string }, context: Context) => {
       requireAuth(context.user)
 
       const event = await context.prisma.event.findUnique({

@@ -1,5 +1,6 @@
 import { withFilter } from 'graphql-subscriptions'
 import { pubSub } from '../context'
+import type { AuthUser } from '../auth/utils'
 
 export const subscriptionResolvers = {
   Subscription: {
@@ -8,27 +9,42 @@ export const subscriptionResolvers = {
         () => {
           return pubSub.asyncIterator('TICKET_BOOKED')
         },
-        (payload: any, _root: any, args?: { eventId: string }) => {
+        (
+          payload: { ticketBooked?: { event?: { id?: string } } },
+          _root: unknown,
+          args?: { eventId?: string }
+        ) => {
           if (!args?.eventId) return false
           return payload.ticketBooked?.event?.id === args.eventId
         }
       ),
-      resolve: (payload: any) => {
+      resolve: (payload: { ticketBooked: unknown }) => {
         return payload.ticketBooked
       },
     },
     eventCapacityChanged: {
       subscribe: withFilter(
-        (_parent: any, args: any, context: any) => {
+        (_parent: unknown, _args: { eventId?: string }, _context: { user?: AuthUser }) => {
           console.log(
             '=======================Subscription: listening for EVENT_CAPACITY_CHANGED, args:',
-            args,
+            _args,
             'context:',
-            context?.user?.id
+            _context?.user?.id
           )
           return pubSub.asyncIterator('EVENT_CAPACITY_CHANGED')
         },
-        (payload: any, args: any, context?: any) => {
+        (
+          payload: {
+            eventCapacityChanged?: {
+              eventId?: string
+              capacity?: number
+              remaining?: number
+              booked?: number
+            }
+          },
+          args: { eventId?: string },
+          context?: { user?: AuthUser }
+        ) => {
           console.log('=======================Subscription filter:', {
             payload: payload.eventCapacityChanged,
             argsEventId: args?.eventId,
@@ -39,7 +55,14 @@ export const subscriptionResolvers = {
           return payload.eventCapacityChanged?.eventId === args.eventId
         }
       ),
-      resolve: (payload: any) => {
+      resolve: (payload: {
+        eventCapacityChanged: {
+          eventId: string
+          capacity: number
+          remaining: number
+          booked: number
+        }
+      }) => {
         console.log('=======================Subscription resolve:', payload.eventCapacityChanged)
         return payload.eventCapacityChanged
       },

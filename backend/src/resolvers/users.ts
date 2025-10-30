@@ -4,7 +4,7 @@ import { Role } from '@prisma/client'
 
 export const userResolvers = {
   Query: {
-    users: async (_: any, __: any, context: Context) => {
+    users: async (_: unknown, __: unknown, context: Context) => {
       requireAuth(context.user)
       requireRole(context.user, [Role.ADMIN])
 
@@ -22,7 +22,7 @@ export const userResolvers = {
 
   Mutation: {
     updateUserRoles: async (
-      _: any,
+      _: unknown,
       { userId, roles }: { userId: string; roles: Role[] },
       context: Context
     ) => {
@@ -55,7 +55,7 @@ export const userResolvers = {
       return updatedUser
     },
 
-    deleteUser: async (_: any, { userId }: { userId: string }, context: Context) => {
+    deleteUser: async (_: unknown, { userId }: { userId: string }, context: Context) => {
       requireAuth(context.user)
       requireRole(context.user, [Role.ADMIN])
 

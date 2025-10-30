@@ -4,7 +4,7 @@ import { Role, TicketStatus } from '@prisma/client'
 
 export const ticketResolvers = {
   Query: {
-    myTickets: async (_: any, __: any, context: Context) => {
+    myTickets: async (_: unknown, __: unknown, context: Context) => {
       requireAuth(context.user)
 
       const tickets = await context.prisma.ticket.findMany({
@@ -23,7 +23,7 @@ export const ticketResolvers = {
       return tickets
     },
 
-    eventAttendees: async (_: any, { eventId }: { eventId: string }, context: Context) => {
+    eventAttendees: async (_: unknown, { eventId }: { eventId: string }, context: Context) => {
       requireAuth(context.user)
       requireRole(context.user, [Role.ORGANIZER, Role.ADMIN])
 
@@ -60,7 +60,7 @@ export const ticketResolvers = {
 
   Mutation: {
     bookTicket: async (
-      _: any,
+      _: unknown,
       { eventId, type }: { eventId: string; type?: string },
       context: Context
     ) => {
@@ -168,7 +168,7 @@ export const ticketResolvers = {
       return result.ticket
     },
 
-    cancelTicket: async (_: any, { id }: { id: string }, context: Context) => {
+    cancelTicket: async (_: unknown, { id }: { id: string }, context: Context) => {
       requireAuth(context.user)
 
       const ticket = await context.prisma.ticket.findUnique({

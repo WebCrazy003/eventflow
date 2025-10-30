@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
+import { TokenPayload } from './utils'
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -19,11 +20,11 @@ export function authMiddleware(req: AuthenticatedRequest, res: Response, next: N
   const token = authHeader.substring(7)
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload
     req.user = {
       id: decoded.userId,
       email: decoded.email,
-      roles: decoded.roles || [],
+      roles: decoded.roles,
     }
   } catch (error) {
     console.log('Invalid token:', error)

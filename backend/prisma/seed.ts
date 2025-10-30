@@ -62,7 +62,7 @@ async function main() {
     },
   })
 
-  const musicFestival = await prisma.event.upsert({
+  const _musicFestival = await prisma.event.upsert({
     where: { id: 'music-fest-2024' },
     update: {},
     create: {
