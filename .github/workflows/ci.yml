@@ -138,13 +138,17 @@ jobs:
           cache-to: type=registry,ref=${{ env.FRONTEND_IMAGE }}:buildcache,mode=max
 
       - name: Trigger Render Backend Deploy
-        if: ${{ success() && secrets.RENDER_WEBHOOK_BACKEND_URL != '' }}
+        if: ${{ success() && env.RENDER_WEBHOOK_BACKEND_URL != '' }}
+        env:
+          RENDER_WEBHOOK_BACKEND_URL: ${{ secrets.RENDER_WEBHOOK_BACKEND_URL }}
         run: |
-          curl -fsSL -X POST "${{ secrets.RENDER_WEBHOOK_BACKEND_URL }}"
+          curl -fsSL -X POST "${RENDER_WEBHOOK_BACKEND_URL}"
 
       - name: Trigger Render Frontend Deploy
-        if: ${{ success() && secrets.RENDER_WEBHOOK_FRONTEND_URL != '' }}
+        if: ${{ success() && env.RENDER_WEBHOOK_FRONTEND_URL != '' }}
+        env:
+          RENDER_WEBHOOK_FRONTEND_URL: ${{ secrets.RENDER_WEBHOOK_FRONTEND_URL }}
         run: |
-          curl -fsSL -X POST "${{ secrets.RENDER_WEBHOOK_FRONTEND_URL }}"
+          curl -fsSL -X POST "${RENDER_WEBHOOK_FRONTEND_URL}"
 
 
