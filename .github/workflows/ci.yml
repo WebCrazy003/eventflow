@@ -1,10 +1,21 @@
-name: CI
+name: CI - Build and Deploy FE/BE
 
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/${{ github.repository }}-backend
+  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}-frontend
 
 jobs:
   tests:
@@ -15,9 +26,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: secrets.POSTGRES_USER
-          POSTGRES_PASSWORD: secrets.POSTGRES_PASSWORD
-          POSTGRES_DB: secrets.POSTGRES_DB
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: >-
@@ -43,7 +54,7 @@ jobs:
       - name: Prepare backend database (migrations)
         working-directory: backend
         env:
-          DATABASE_URL: secrets.POSTGRES_DB_URL
+          DATABASE_URL: ${{ secrets.POSTGRES_DB_URL }}
         run: |
           npx prisma generate
           npx prisma migrate deploy
@@ -51,9 +62,9 @@ jobs:
       - name: Run backend tests
         working-directory: backend
         env:
-          DATABASE_URL: secrets.POSTGRES_DB_URL
-          JWT_SECRET: secrets.JWT_SECRET
-          JWT_REFRESH_SECRET: secrets.JWT_REFRESH_SECRET
+          DATABASE_URL: ${{ secrets.POSTGRES_DB_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: npm test -- --run
 
       - name: Install frontend deps
@@ -69,52 +80,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: tests
     if: success()
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Build backend
-        working-directory: backend
-        run: |
-          npm ci
-          npm run build
-
-      - name: Build frontend
-        working-directory: frontend
-        run: |
-          npm ci
-          npm run build
-
-      # - name: Deploy
-      #   run: |
-      #     echo "Add your deployment steps here (e.g., Docker push, kubectl, etc.)"
-
-name: CI - Build and Deploy FE/BE
-
-on:
-  push:
-    branches: [ main ]
-    tags: [ 'v*.*.*' ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  packages: write
-
-env:
-  REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository }}-backend
-  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}-frontend
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
