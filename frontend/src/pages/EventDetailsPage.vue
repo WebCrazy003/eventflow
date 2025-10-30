@@ -228,7 +228,7 @@ const { result: subscriptionResult, error: subscriptionError } = useSubscription
     eventId: route.params.id as string
   })),
   {
-    skip: computed(() => !route.params.id)
+    enabled: computed(() => !!route.params.id)
   }
 )
 

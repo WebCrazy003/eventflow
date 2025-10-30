@@ -234,7 +234,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable'
 import { EVENTS_QUERY, CREATE_EVENT_MUTATION, UPDATE_EVENT_MUTATION, DELETE_EVENT_MUTATION, ADD_EVENT_IMAGE_MUTATION, REMOVE_EVENT_IMAGE_MUTATION } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import type { Event, CreateEventInput, EventImage } from '@/types'
+import type { Event as GQLEvent, CreateEventInput, EventImage } from '@/types'
 import StatCard from '@/components/StatCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -246,7 +246,7 @@ const toast = useToast()
 
 const showEventModal = ref(false)
 const isSaving = ref(false)
-const editingEvent = ref<Event | null>(null)
+const editingEvent = ref<GQLEvent | null>(null)
 const eventImages = ref<(EventImage & { id?: string })[]>([])
 const fileInput = ref<HTMLInputElement | null>(null)
 const uploadingImage = ref(false)
@@ -307,7 +307,7 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const getBookedCount = (event: Event) => {
+const getBookedCount = (event: GQLEvent) => {
   return event.tickets?.filter(ticket => ticket.status === 'CONFIRMED').length || 0
 }
 
@@ -377,7 +377,7 @@ const createEvent = async () => {
   }
 }
 
-const editEvent = (event: Event) => {
+const editEvent = (event: GQLEvent) => {
   editingEvent.value = event
   newEvent.value = {
     title: event.title,
@@ -400,8 +400,8 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
-const handleImageUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
+const handleImageUpload = async (e: Event) => {
+  const target = e.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
 
