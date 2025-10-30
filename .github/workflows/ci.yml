@@ -2,10 +2,10 @@ name: CI - Build and Deploy FE/BE
 
 on:
   push:
-    branches: [ main ]
-    tags: [ 'v*.*.*' ]
+    branches: [main]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +16,7 @@ env:
   REGISTRY: ghcr.io
   BACKEND_IMAGE: ghcr.io/${{ github.repository }}-backend
   FRONTEND_IMAGE: ghcr.io/${{ github.repository }}-frontend
+  POSTGRES_DB_URL: postgresql://root:password@localhost:5432/eventflow
 
 jobs:
   tests:
@@ -26,12 +27,12 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: eventflow
         ports:
           - 5432:5432
-        options: >-
+        ptions: >-
           --health-cmd "pg_isready -U postgres" \
           --health-interval 10s \
           --health-timeout 5s \
@@ -44,8 +45,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       - name: Install backend deps
         working-directory: backend
@@ -54,7 +55,7 @@ jobs:
       - name: Prepare backend database (migrations)
         working-directory: backend
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_DB_URL }}
+          DATABASE_URL: ${{ env.POSTGRES_DB_URL }}
         run: |
           npx prisma generate
           npx prisma migrate deploy
@@ -62,7 +63,7 @@ jobs:
       - name: Run backend tests
         working-directory: backend
         env:
-          DATABASE_URL: ${{ secrets.POSTGRES_DB_URL }}
+          DATABASE_URL: ${{ env.POSTGRES_DB_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
         run: npm test -- --run
@@ -150,5 +151,3 @@ jobs:
           RENDER_WEBHOOK_FRONTEND_URL: ${{ secrets.RENDER_WEBHOOK_FRONTEND_URL }}
         run: |
           curl -fsSL -X POST "${RENDER_WEBHOOK_FRONTEND_URL}"
-
-
