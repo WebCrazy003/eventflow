@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import { Request } from 'express'
 import { EventEmitter } from 'events'
 import { PubSubEngine } from 'graphql-subscriptions'
 import type { TokenPayload, AuthUser } from './auth/utils'
 
-class EventEmitterPubSub extends EventEmitter implements PubSubEngine {
+class EventEmitterPubSub extends EventEmitter {
   publish(triggerName: string, payload: unknown): Promise<void> {
     this.emit(triggerName, payload)
     return Promise.resolve()
@@ -86,7 +86,7 @@ class TriggerIterator<T> implements AsyncIterator<T> {
   }
 }
 
-export const pubSub = new EventEmitterPubSub()
+export const pubSub: PubSubEngine = new EventEmitterPubSub() as unknown as PubSubEngine
 
 // Share a single PrismaClient instance across requests
 let prismaClient: PrismaClient
@@ -101,11 +101,7 @@ function getPrismaClient(): PrismaClient {
 export interface Context {
   prisma: PrismaClient
   pubSub: PubSubEngine
-  user?: {
-    id: string
-    email: string
-    roles: string[]
-  }
+  user?: AuthUser
 }
 
 type ConnectionParams = { connectionParams?: { authorization?: string } }

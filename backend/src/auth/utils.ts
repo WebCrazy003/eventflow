@@ -54,7 +54,7 @@ export function hasRole(userRoles: Role[], requiredRoles: Role[]): boolean {
   return requiredRoles.some(role => userRoles.includes(role))
 }
 
-export function requireAuth(user: AuthUser | undefined): void {
+export function requireAuth(user: AuthUser | undefined): asserts user is AuthUser {
   if (!user) {
     throw new Error('Authentication required')
   }
