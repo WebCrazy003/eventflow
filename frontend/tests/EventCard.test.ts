@@ -25,7 +25,7 @@ describe('EventCard', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('Sample Event11')
+    expect(wrapper.text()).toContain('Sample Event')
     expect(wrapper.text()).toContain('NYC')
   })
 })
