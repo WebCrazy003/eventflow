@@ -118,7 +118,7 @@ async function startServer() {
       }
 
       const fileUrl = `/uploads/${req.file.filename}`;
-      res.json({
+      return res.json({
         url: fileUrl,
         filename: req.file.filename,
         path: req.file.path,
