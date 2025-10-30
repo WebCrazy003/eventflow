@@ -9,32 +9,32 @@
         </div>
 
         <div class="flex items-center space-x-4">
-          <router-link 
-            to="/events" 
+          <router-link
+            to="/events"
             class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
           >
             Events
           </router-link>
 
           <template v-if="authStore.isAuthenticated">
-            <router-link 
-              to="/my-tickets" 
+            <router-link
+              to="/my-tickets"
               class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               My Tickets
             </router-link>
 
-            <router-link 
+            <router-link
               v-if="authStore.isOrganizer"
-              to="/dashboard" 
+              to="/dashboard"
               class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               Dashboard
             </router-link>
 
-            <router-link 
+            <router-link
               v-if="authStore.isAdmin"
-              to="/admin" 
+              to="/admin"
               class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               Admin
@@ -44,14 +44,14 @@
           </template>
 
           <template v-else>
-            <router-link 
-              to="/login" 
+            <router-link
+              to="/login"
               class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
             >
               Login
             </router-link>
-            <router-link 
-              to="/register" 
+            <router-link
+              to="/register"
               class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
             >
               Register
@@ -73,13 +73,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
 
-
 const handleLogout = () => {
   authStore.logout()
   toast.success('Logged out successfully')
   router.push('/')
 }
-
 </script>
-
-

@@ -1,11 +1,15 @@
 <template>
   <Transition>
-    <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="close">
+    <div
+      v-if="show"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="close"
+    >
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h2 class="text-xl font-semibold mb-4">{{ title }}</h2>
-        
+
         <slot></slot>
-        
+
         <div v-if="$slots.footer" class="flex justify-end space-x-3 mt-6">
           <slot name="footer"></slot>
         </div>
@@ -40,4 +44,3 @@ const close = () => {
   opacity: 0;
 }
 </style>
-

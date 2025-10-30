@@ -8,10 +8,7 @@
 
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard
-          :value="totalEvents"
-          label="Total Events"
-        />
+        <StatCard :value="totalEvents" label="Total Events" />
         <StatCard
           :value="totalTickets"
           label="Total Tickets Sold"
@@ -31,8 +28,8 @@
       <!-- Create Event Button -->
       <div class="mb-8">
         <button
-          @click="openCreateModal"
           class="bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors"
+          @click="openCreateModal"
         >
           Create New Event
         </button>
@@ -43,7 +40,7 @@
         <div class="px-6 py-4 border-b border-gray-200">
           <h2 class="text-xl font-semibold text-gray-900">Your Events</h2>
         </div>
-        
+
         <LoadingSpinner v-if="loading" message="Loading events..." />
 
         <EmptyState
@@ -53,11 +50,7 @@
         />
 
         <div v-else class="divide-y divide-gray-200">
-          <div
-            v-for="event in events"
-            :key="event.id"
-            class="px-6 py-4 hover:bg-gray-50"
-          >
+          <div v-for="event in events" :key="event.id" class="px-6 py-4 hover:bg-gray-50">
             <div class="flex items-center justify-between">
               <div class="flex-1">
                 <h3 class="text-lg font-medium text-gray-900">{{ event.title }}</h3>
@@ -82,14 +75,14 @@
                   View
                 </router-link>
                 <button
-                  @click="editEvent(event)"
                   class="text-gray-600 hover:text-gray-700 text-sm font-medium"
+                  @click="editEvent(event)"
                 >
                   Edit
                 </button>
                 <button
-                  @click="deleteEvent(event.id)"
                   class="text-red-600 hover:text-red-700 text-sm font-medium"
+                  @click="deleteEvent(event.id)"
                 >
                   Delete
                 </button>
@@ -112,7 +105,7 @@
               label="Title"
               :required="true"
             />
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
               <textarea
@@ -121,15 +114,15 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               ></textarea>
             </div>
-            
+
             <Input
               id="event-location"
               :model-value="newEvent.location || ''"
-              @update:model-value="newEvent.location = $event"
               type="text"
               label="Location"
+              @update:model-value="newEvent.location = $event"
             />
-            
+
             <div class="grid grid-cols-2 gap-4">
               <Input
                 id="event-startAt"
@@ -146,9 +139,11 @@
                 :required="true"
               />
             </div>
-            
+
             <div>
-              <label for="event-capacity" class="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+              <label for="event-capacity" class="block text-sm font-medium text-gray-700 mb-1"
+                >Capacity</label
+              >
               <input
                 id="event-capacity"
                 v-model.number="newEvent.capacity"
@@ -157,11 +152,11 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             <!-- Event Images -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Event Images</label>
-              
+
               <!-- Current Images -->
               <div v-if="eventImages.length > 0" class="grid grid-cols-3 gap-2 mb-3">
                 <div
@@ -175,51 +170,51 @@
                     class="w-full h-24 object-cover rounded-md border border-gray-300"
                   />
                   <button
-                    @click="removeImage(image)"
                     class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
                     type="button"
+                    @click="removeImage(image)"
                   >
                     ×
                   </button>
                 </div>
               </div>
-              
+
               <!-- Upload Button -->
               <div>
                 <input
                   ref="fileInput"
                   type="file"
                   accept="image/*"
-                  @change="handleImageUpload"
                   class="hidden"
+                  @change="handleImageUpload"
                 />
-                  <button
-                    @click="triggerFileInput"
-                    type="button"
-                    :disabled="uploadingImage"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                  >
-                    {{ uploadingImage ? 'Uploading...' : 'Add Image' }}
-                  </button>
+                <button
+                  type="button"
+                  :disabled="uploadingImage"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  @click="triggerFileInput"
+                >
+                  {{ uploadingImage ? 'Uploading...' : 'Add Image' }}
+                </button>
               </div>
             </div>
           </div>
         </form>
       </template>
-      
+
       <template #footer>
         <button
           type="button"
-          @click="showEventModal = false"
           class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+          @click="showEventModal = false"
         >
           Cancel
         </button>
         <button
           type="button"
-          @click="handleSubmit"
           :disabled="isSaving"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+          @click="handleSubmit"
         >
           {{ submitButtonText }}
         </button>
@@ -231,7 +226,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { EVENTS_QUERY, CREATE_EVENT_MUTATION, UPDATE_EVENT_MUTATION, DELETE_EVENT_MUTATION, ADD_EVENT_IMAGE_MUTATION, REMOVE_EVENT_IMAGE_MUTATION } from '@/graphql/queries'
+import {
+  EVENTS_QUERY,
+  CREATE_EVENT_MUTATION,
+  UPDATE_EVENT_MUTATION,
+  DELETE_EVENT_MUTATION,
+  ADD_EVENT_IMAGE_MUTATION,
+  REMOVE_EVENT_IMAGE_MUTATION,
+} from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import type { Event as GQLEvent, CreateEventInput, EventImage } from '@/types'
@@ -253,8 +255,16 @@ const uploadingImage = ref(false)
 
 // Computed properties for modal behavior
 const isEditMode = computed(() => editingEvent.value !== null)
-const modalTitle = computed(() => isEditMode.value ? 'Edit Event' : 'Create New Event')
-const submitButtonText = computed(() => isSaving.value ? (isEditMode.value ? 'Updating...' : 'Creating...') : (isEditMode.value ? 'Update Event' : 'Create Event'))
+const modalTitle = computed(() => (isEditMode.value ? 'Edit Event' : 'Create New Event'))
+const submitButtonText = computed(() =>
+  isSaving.value
+    ? isEditMode.value
+      ? 'Updating...'
+      : 'Creating...'
+    : isEditMode.value
+      ? 'Update Event'
+      : 'Create Event'
+)
 
 const newEvent = ref<CreateEventInput>({
   title: '',
@@ -267,7 +277,7 @@ const newEvent = ref<CreateEventInput>({
 
 const { result, loading, refetch } = useQuery(EVENTS_QUERY, {
   filter: { organizerId: authStore.user?.id },
-  pagination: { first: 50 }
+  pagination: { first: 50 },
 })
 
 const { mutate: createEventMutation } = useMutation(CREATE_EVENT_MUTATION)
@@ -287,7 +297,9 @@ const totalEvents = computed(() => events.value.length)
 
 const totalTickets = computed(() => {
   return events.value.reduce((total: number, event: any) => {
-    return total + (event.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0)
+    return (
+      total + (event.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0)
+    )
   }, 0)
 })
 
@@ -303,7 +315,7 @@ const formatDate = (dateString: string) => {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -330,7 +342,9 @@ const openCreateModal = () => {
   const now = new Date()
   const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
   newEvent.value.startAt = tomorrow.toISOString().slice(0, 16)
-  newEvent.value.endAt = new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16)
+  newEvent.value.endAt = new Date(tomorrow.getTime() + 2 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 16)
   showEventModal.value = true
 }
 
@@ -344,16 +358,16 @@ const handleSubmit = async () => {
 
 const createEvent = async () => {
   isSaving.value = true
-  
+
   try {
     const result = await createEventMutation({
       input: {
         ...newEvent.value,
         startAt: new Date(newEvent.value.startAt).toISOString(),
         endAt: new Date(newEvent.value.endAt).toISOString(),
-      }
+      },
     })
-    
+
     // Add images after event is created
     if (eventImages.value.length > 0 && result?.data?.createEvent?.id) {
       for (const image of eventImages.value) {
@@ -364,7 +378,7 @@ const createEvent = async () => {
         })
       }
     }
-    
+
     toast.success('Event created successfully!')
     showEventModal.value = false
     resetForm()
@@ -476,9 +490,9 @@ const removeImage = async (image: EventImage & { id?: string }) => {
 
 const updateEvent = async () => {
   if (!editingEvent.value) return
-  
+
   isSaving.value = true
-  
+
   try {
     await updateEventMutation({
       id: editingEvent.value.id,
@@ -489,9 +503,9 @@ const updateEvent = async () => {
         startAt: new Date(newEvent.value.startAt).toISOString(),
         endAt: new Date(newEvent.value.endAt).toISOString(),
         capacity: newEvent.value.capacity,
-      }
+      },
     })
-    
+
     toast.success('Event updated successfully!')
     showEventModal.value = false
     resetForm()
@@ -508,11 +522,11 @@ const deleteEvent = async (eventId: string) => {
   if (!confirm('Are you sure you want to delete this event?')) {
     return
   }
-  
+
   try {
     await deleteEventMutation({ id: eventId })
     toast.success('Event deleted successfully!')
-    
+
     // Refresh events list
     await refetch()
   } catch (error) {
@@ -520,6 +534,4 @@ const deleteEvent = async (eventId: string) => {
     console.error('Delete event error:', error)
   }
 }
-
 </script>
-

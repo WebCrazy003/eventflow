@@ -42,16 +42,16 @@ app.provide(DefaultApolloClient, apolloClient)
 async function initAuth() {
   const { useAuthStore } = await import('./stores/auth')
   const authStore = useAuthStore()
-  
+
   // If we have a token but no user, fetch the user directly
   if (authStore.accessToken && !authStore.user) {
     try {
       // Fetch user data directly using the Apollo client
       const result = await apolloClient.query({
         query: (await import('./graphql/queries')).ME_QUERY,
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
-      
+
       if (result?.data?.me) {
         authStore.setUser(result.data.me)
       }

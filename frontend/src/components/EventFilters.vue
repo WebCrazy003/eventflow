@@ -13,7 +13,9 @@
           />
         </div>
         <div>
-          <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+          <label for="location" class="block text-sm font-medium text-gray-700 mb-1"
+            >Location</label
+          >
           <input
             id="location"
             v-model="localFilters.location"
@@ -23,7 +25,9 @@
           />
         </div>
         <div>
-          <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+          <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1"
+            >Start Date</label
+          >
           <input
             id="startDate"
             v-model="localFilters.startDate"
@@ -42,10 +46,7 @@
         </div>
       </div>
       <div class="mt-4 flex justify-end">
-        <button
-          @click="clearFilters"
-          class="text-sm text-gray-600 hover:text-gray-800"
-        >
+        <button class="text-sm text-gray-600 hover:text-gray-800" @click="clearFilters">
           Clear filters
         </button>
       </div>
@@ -74,14 +75,22 @@ const emit = defineEmits<{
 const localFilters = reactive({ ...props.modelValue })
 
 // Watch props to update localFilters when parent changes
-watch(() => props.modelValue, (newValue) => {
-  Object.assign(localFilters, newValue)
-}, { deep: true })
+watch(
+  () => props.modelValue,
+  newValue => {
+    Object.assign(localFilters, newValue)
+  },
+  { deep: true }
+)
 
 // Watch localFilters to emit changes to parent
-watch(localFilters, (newValue) => {
-  emit('update:modelValue', newValue)
-}, { deep: true })
+watch(
+  localFilters,
+  newValue => {
+    emit('update:modelValue', newValue)
+  },
+  { deep: true }
+)
 
 const clearFilters = () => {
   localFilters.search = ''
@@ -90,4 +99,3 @@ const clearFilters = () => {
   localFilters.endDate = ''
 }
 </script>
-

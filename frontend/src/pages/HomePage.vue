@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen">
     <!-- Hero Section -->
-    <HeroSection 
+    <HeroSection
       title="Discover Amazing Events"
       description="Find, book, and manage events with EventFlow"
     >
@@ -26,39 +26,71 @@
     <div class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">
-            Why Choose EventFlow?
-          </h2>
-          <p class="text-lg text-gray-600">
-            Everything you need to manage events and bookings
-          </p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose EventFlow?</h2>
+          <p class="text-lg text-gray-600">Everything you need to manage events and bookings</p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="text-center">
-            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            <div
+              class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
               </svg>
             </div>
             <h3 class="text-xl font-semibold mb-2">Easy Booking</h3>
             <p class="text-gray-600">Book tickets for events with just a few clicks</p>
           </div>
-          
+
           <div class="text-center">
-            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <div
+              class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                ></path>
               </svg>
             </div>
             <h3 class="text-xl font-semibold mb-2">Real-time Updates</h3>
             <p class="text-gray-600">Get live updates on event capacity and bookings</p>
           </div>
-          
+
           <div class="text-center">
-            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <div
+              class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-8 h-8 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
               </svg>
             </div>
             <h3 class="text-xl font-semibold mb-2">Secure & Reliable</h3>
@@ -72,18 +104,14 @@
     <div class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">
-            Featured Events
-          </h2>
-          <p class="text-lg text-gray-600">
-            Check out these popular events
-          </p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Featured Events</h2>
+          <p class="text-lg text-gray-600">Check out these popular events</p>
         </div>
-        
+
         <!-- <div v-if="loading" class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
         </div> -->
-        
+
         <div v-if="events.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <EventCard
             v-for="event in events.slice(0, 6)"
@@ -92,7 +120,7 @@
             :show-location="true"
           />
         </div>
-        
+
         <EmptyState
           v-else
           title="No events available"
@@ -119,7 +147,7 @@ const events = ref<Event[]>([])
 
 const { result } = useQuery(EVENTS_QUERY, {
   filter: {},
-  pagination: { first: 6 }
+  pagination: { first: 6 },
 })
 
 onMounted(() => {
@@ -128,6 +156,4 @@ onMounted(() => {
     // loading.value = false
   }
 })
-
 </script>
-

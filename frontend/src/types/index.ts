@@ -57,7 +57,6 @@ export interface Ticket {
   updatedAt: string
 }
 
-
 export interface AuthPayload {
   accessToken: string
   refreshToken: string

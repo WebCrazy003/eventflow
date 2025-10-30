@@ -12,7 +12,7 @@
           </router-link>
         </p>
       </div>
-      
+
       <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
           <Input
@@ -47,8 +47,19 @@
           >
             <span v-if="loading" class="absolute left-0 inset-y-0 flex items-center pl-3">
               <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
             {{ loading ? 'Signing in...' : 'Sign in' }}
@@ -89,7 +100,7 @@ const handleLogin = async () => {
 
   try {
     const result = await authStore.login(form.email, form.password)
-    
+
     if (result.success) {
       toast.success('Login successful!')
       router.push('/')
@@ -103,4 +114,3 @@ const handleLogin = async () => {
   }
 }
 </script>
-

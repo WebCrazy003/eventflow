@@ -10,4 +10,3 @@ defineProps<{
   message?: string
 }>()
 </script>
-

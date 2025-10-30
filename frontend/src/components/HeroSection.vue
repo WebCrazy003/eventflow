@@ -22,4 +22,3 @@ defineProps<{
   description: string
 }>()
 </script>
-

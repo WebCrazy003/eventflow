@@ -43,18 +43,18 @@ const router = createRouter({
       path: '/dashboard',
       name: 'Dashboard',
       component: () => import('@/pages/DashboardPage.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
-        requiredRoles: [Role.ORGANIZER, Role.ADMIN]
+        requiredRoles: [Role.ORGANIZER, Role.ADMIN],
       },
     },
     {
       path: '/admin',
       name: 'Admin',
       component: () => import('@/pages/AdminPage.vue'),
-      meta: { 
+      meta: {
         requiresAuth: true,
-        requiredRoles: [Role.ADMIN]
+        requiredRoles: [Role.ADMIN],
       },
     },
     {
@@ -68,19 +68,19 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
-  
+
   // Check if route requires authentication
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
     return
   }
-  
+
   // Check if route requires guest (not authenticated)
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/')
     return
   }
-  
+
   // Check if route requires specific roles
   // Note: user might not be loaded yet on initial page load
   if (to.meta.requiredRoles && authStore.isAuthenticated) {
@@ -89,17 +89,17 @@ router.beforeEach((to, _from, next) => {
       next()
       return
     }
-    
-    const hasRequiredRole = (to.meta.requiredRoles as Role[]).some((role: Role) => 
+
+    const hasRequiredRole = (to.meta.requiredRoles as Role[]).some((role: Role) =>
       authStore.user?.roles.includes(role)
     )
-    
+
     if (!hasRequiredRole) {
       next('/')
       return
     }
   }
-  
+
   next()
 })
 

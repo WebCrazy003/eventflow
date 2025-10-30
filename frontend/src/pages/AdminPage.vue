@@ -42,19 +42,43 @@
         <div class="px-6 py-4 border-b border-gray-200">
           <h2 class="text-xl font-semibold text-gray-900">Users Management</h2>
         </div>
-        
+
         <LoadingSpinner v-if="usersLoading" message="Loading users..." />
 
         <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Events</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  User
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Email
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Roles
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Events
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Tickets
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -72,7 +96,7 @@
                       :class="{
                         'bg-blue-100 text-blue-800': role === 'USER',
                         'bg-green-100 text-green-800': role === 'ORGANIZER',
-                        'bg-purple-100 text-purple-800': role === 'ADMIN'
+                        'bg-purple-100 text-purple-800': role === 'ADMIN',
                       }"
                       class="px-2 py-1 rounded-full text-xs font-medium"
                     >
@@ -80,19 +104,23 @@
                     </span>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.events?.length || 0 }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.tickets?.length || 0 }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ user.events?.length || 0 }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {{ user.tickets?.length || 0 }}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    @click="editUserRoles(user)"
                     class="text-blue-600 hover:text-blue-900 mr-3"
+                    @click="editUserRoles(user)"
                   >
                     Edit Roles
                   </button>
                   <button
                     v-if="user.id !== authStore.user?.id"
-                    @click="deleteUser(user.id)"
                     class="text-red-600 hover:text-red-900"
+                    @click="deleteUser(user.id)"
                   >
                     Delete
                   </button>
@@ -110,7 +138,7 @@
         <p class="text-sm text-gray-600 mb-2">User: {{ selectedUser?.name }}</p>
         <p class="text-sm text-gray-600">Email: {{ selectedUser?.email }}</p>
       </div>
-      
+
       <div class="space-y-3">
         <label class="flex items-center">
           <input
@@ -140,18 +168,18 @@
           <span class="ml-2 text-sm text-gray-700">Admin</span>
         </label>
       </div>
-      
+
       <template #footer>
         <button
-          @click="showRoleModal = false"
           class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+          @click="showRoleModal = false"
         >
           Cancel
         </button>
         <button
-          @click="updateUserRoles"
           :disabled="updating"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+          @click="updateUserRoles"
         >
           {{ updating ? 'Updating...' : 'Update Roles' }}
         </button>
@@ -163,7 +191,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useQuery, useMutation } from '@vue/apollo-composable'
-import { USERS_QUERY, EVENTS_QUERY, UPDATE_USER_ROLES_MUTATION, DELETE_USER_MUTATION } from '@/graphql/queries'
+import {
+  USERS_QUERY,
+  EVENTS_QUERY,
+  UPDATE_USER_ROLES_MUTATION,
+  DELETE_USER_MUTATION,
+} from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import type { User, Role } from '@/types'
@@ -181,7 +214,7 @@ const updating = ref(false)
 
 const { result: usersResult, loading: usersLoading, refetch: refetchUsers } = useQuery(USERS_QUERY)
 const { result: eventsResult } = useQuery(EVENTS_QUERY, {
-  pagination: { first: 1000 }
+  pagination: { first: 1000 },
 })
 
 const { mutate: updateUserRolesMutation } = useMutation(UPDATE_USER_ROLES_MUTATION)
@@ -210,18 +243,18 @@ const editUserRoles = (user: User) => {
 
 const updateUserRoles = async () => {
   if (!selectedUser.value) return
-  
+
   updating.value = true
-  
+
   try {
     await updateUserRolesMutation({
       userId: selectedUser.value.id,
-      roles: selectedRoles.value
+      roles: selectedRoles.value,
     })
-    
+
     toast.success('User roles updated successfully!')
     showRoleModal.value = false
-    
+
     // Refresh users list
     await refetchUsers()
   } catch (error) {
@@ -236,11 +269,11 @@ const deleteUser = async (userId: string) => {
   if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
     return
   }
-  
+
   try {
     await deleteUserMutation({ userId })
     toast.success('User deleted successfully!')
-    
+
     // Refresh users list
     await refetchUsers()
   } catch (error) {
@@ -253,4 +286,3 @@ onMounted(() => {
   // Initialize any admin-specific data
 })
 </script>
-

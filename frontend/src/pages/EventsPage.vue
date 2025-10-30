@@ -21,10 +21,7 @@
     </div>
 
     <!-- Filters -->
-    <EventFilters
-      :modelValue="filters"
-      @update:modelValue="(val) => Object.assign(filters, val)"
-    />
+    <EventFilters :model-value="filters" @update:model-value="val => Object.assign(filters, val)" />
 
     <!-- Events Grid -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -52,8 +49,8 @@
         <!-- Load More Button -->
         <div v-if="hasNextPage && !loading" class="text-center mt-8">
           <button
-            @click="loadMore"
             class="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded-md text-sm font-medium hover:bg-blue-50 transition-colors"
+            @click="loadMore"
           >
             Load More Events
           </button>
@@ -88,8 +85,12 @@ const loading = ref(true)
 const hasNextPage = ref(false)
 const endCursor = ref<string | null>(null)
 
-
-const { loading: queryLoading, fetchMore, refetch, onResult } = useQuery(EVENTS_QUERY, {
+const {
+  loading: queryLoading,
+  fetchMore,
+  refetch,
+  onResult,
+} = useQuery(EVENTS_QUERY, {
   filter: filters,
   pagination: {
     first: 3,
@@ -110,7 +111,7 @@ onResult(onFetchComplete)
 
 const loadMore = async () => {
   if (!hasNextPage.value || queryLoading.value) return
-  
+
   try {
     await fetchMore({
       variables: {
@@ -139,11 +140,7 @@ const loadMore = async () => {
   }
 }
 
-
-
-
 onMounted(() => {
   refetch()
 })
 </script>
-

@@ -1,10 +1,10 @@
 <template>
-  <div class="relative" ref="menuRef">
+  <div ref="menuRef" class="relative">
     <button
-      @click="toggleMenu"
       class="h-9 w-9 rounded-full bg-blue-600 text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400"
       aria-haspopup="true"
       :aria-expanded="isMenuOpen ? 'true' : 'false'"
+      @click="toggleMenu"
     >
       <span class="text-sm font-semibold">
         {{ userInitials }}
@@ -21,9 +21,9 @@
       </div>
       <div class="py-1">
         <button
-          @click="emitLogout"
           class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           role="menuitem"
+          @click="emitLogout"
         >
           Logout
         </button>
@@ -74,5 +74,3 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleDocumentClick)
 })
 </script>
-
-

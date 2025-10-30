@@ -2,8 +2,19 @@
   <div class="bg-white rounded-lg shadow-md p-6">
     <div class="flex items-center">
       <div :class="iconBgClass" class="p-2 rounded-lg">
-        <svg class="w-6 h-6" :class="iconColorClass" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path :stroke-linecap="strokeLinecap" :stroke-linejoin="strokeLinejoin" :stroke-width="strokeWidth" :d="iconPath"></path>
+        <svg
+          class="w-6 h-6"
+          :class="iconColorClass"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            :stroke-linecap="strokeLinecap"
+            :stroke-linejoin="strokeLinejoin"
+            :stroke-width="strokeWidth"
+            :d="iconPath"
+          ></path>
         </svg>
       </div>
       <div class="ml-4">
@@ -31,9 +42,10 @@ const props = defineProps<{
 
 const iconBgClass = props.iconBgClass || 'bg-blue-100'
 const iconColorClass = props.iconColorClass || 'text-blue-600'
-const iconPath = props.iconPath || 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
+const iconPath =
+  props.iconPath ||
+  'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
 const strokeLinecap = props.strokeLinecap || ('round' as StrokeLinecap)
 const strokeLinejoin = props.strokeLinejoin || ('round' as StrokeLinejoin)
 const strokeWidth = props.strokeWidth || '2'
 </script>
-

@@ -27,11 +27,21 @@
           />
         </div>
         <div v-else class="h-64 md:h-96 bg-gray-200 flex items-center justify-center">
-          <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          <svg
+            class="w-16 h-16 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            ></path>
           </svg>
         </div>
-        
+
         <div class="p-8">
           <div class="flex items-start justify-between mb-6">
             <div>
@@ -42,37 +52,70 @@
               <div class="text-2xl font-bold text-blue-600 mb-2">
                 {{ remainingTickets }} / {{ event.capacity }} tickets left
               </div>
-              <div class="text-sm text-gray-500">
-                by {{ event.organizer.name }}
-              </div>
+              <div class="text-sm text-gray-500">by {{ event.organizer.name }}</div>
             </div>
           </div>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="flex items-center">
-              <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <svg
+                class="w-6 h-6 text-gray-400 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
               </svg>
               <div>
                 <div class="text-sm font-medium text-gray-900">Start Date</div>
                 <div class="text-sm text-gray-500">{{ formatDate(event.startAt) }}</div>
               </div>
             </div>
-            
+
             <div class="flex items-center">
-              <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <svg
+                class="w-6 h-6 text-gray-400 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
               </svg>
               <div>
                 <div class="text-sm font-medium text-gray-900">End Date</div>
                 <div class="text-sm text-gray-500">{{ formatDate(event.endAt) }}</div>
               </div>
             </div>
-            
+
             <div class="flex items-center">
-              <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <svg
+                class="w-6 h-6 text-gray-400 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                ></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                ></path>
               </svg>
               <div>
                 <div class="text-sm font-medium text-gray-900">Location</div>
@@ -80,16 +123,14 @@
               </div>
             </div>
           </div>
-          
+
           <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-500">
-              Created : {{ formatDate(event.createdAt) }}
-            </div>
+            <div class="text-sm text-gray-500">Created : {{ formatDate(event.createdAt) }}</div>
             <button
               v-if="canBookTicket"
-              @click="bookTicket"
               :disabled="booking || remainingTickets === 0"
               class="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              @click="bookTicket"
             >
               {{ booking ? 'Booking...' : remainingTickets === 0 ? 'Sold Out' : 'Book Ticket' }}
             </button>
@@ -98,9 +139,7 @@
                 Login to book tickets
               </router-link>
             </div>
-            <div v-else class="text-sm text-gray-500">
-              You already have a ticket for this event
-            </div>
+            <div v-else class="text-sm text-gray-500">You already have a ticket for this event</div>
           </div>
         </div>
       </div>
@@ -134,16 +173,28 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Name
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Email
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Ticket Type
                 </th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
                   Status
                 </th>
               </tr>
@@ -160,12 +211,12 @@
                   {{ ticket.type || 'General Admission' }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
+                  <span
                     :class="{
                       'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
                       'bg-green-100 text-green-800': ticket.status === 'CONFIRMED',
                       'bg-red-100 text-red-800': ticket.status === 'CANCELLED',
-                      'bg-yellow-100 text-yellow-800': ticket.status === 'REFUNDED'
+                      'bg-yellow-100 text-yellow-800': ticket.status === 'REFUNDED',
                     }"
                   >
                     {{ ticket.status }}
@@ -203,7 +254,11 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuery, useMutation, useSubscription } from '@vue/apollo-composable'
-import { EVENT_QUERY, BOOK_TICKET_MUTATION, EVENT_CAPACITY_CHANGED_SUBSCRIPTION } from '@/graphql/queries'
+import {
+  EVENT_QUERY,
+  BOOK_TICKET_MUTATION,
+  EVENT_CAPACITY_CHANGED_SUBSCRIPTION,
+} from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import type { CapacityInfo } from '@/types'
@@ -216,7 +271,7 @@ const booking = ref(false)
 const capacityInfo = ref<CapacityInfo | null>(null)
 
 const { result, loading, refetch } = useQuery(EVENT_QUERY, {
-  id: route.params.id
+  id: route.params.id,
 })
 
 const { mutate: bookTicketMutation } = useMutation(BOOK_TICKET_MUTATION)
@@ -225,20 +280,24 @@ const { mutate: bookTicketMutation } = useMutation(BOOK_TICKET_MUTATION)
 const { result: subscriptionResult, error: subscriptionError } = useSubscription(
   EVENT_CAPACITY_CHANGED_SUBSCRIPTION,
   computed(() => ({
-    eventId: route.params.id as string
+    eventId: route.params.id as string,
   })),
   {
-    enabled: computed(() => !!route.params.id)
+    enabled: computed(() => !!route.params.id),
   }
 )
 
 // Log subscription errors for debugging
-watch(subscriptionError, (error) => {
-  if (error) {
-    console.error('Subscription error:', error)
-    toast.error('Failed to connect to live updates')
-  }
-}, { immediate: true })
+watch(
+  subscriptionError,
+  error => {
+    if (error) {
+      console.error('Subscription error:', error)
+      toast.error('Failed to connect to live updates')
+    }
+  },
+  { immediate: true }
+)
 
 const event = computed(() => result.value?.event)
 
@@ -247,20 +306,21 @@ const remainingTickets = computed(() => {
   if (capacityInfo.value?.remaining !== undefined) {
     return capacityInfo.value.remaining
   }
-  
+
   if (!event.value) return 0
-  const bookedTickets = event.value.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0
+  const bookedTickets =
+    event.value.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0
   return event.value.capacity - bookedTickets
 })
 
 const canBookTicket = computed(() => {
   if (!authStore.isAuthenticated || !event.value) return false
-  
+
   // Check if user already has a ticket
-  const userTicket = event.value.tickets?.find((ticket: any) => 
-    ticket?.user?.id === authStore.user?.id && ticket.status === 'CONFIRMED'
+  const userTicket = event.value.tickets?.find(
+    (ticket: any) => ticket?.user?.id === authStore.user?.id && ticket.status === 'CONFIRMED'
   )
-  
+
   return !userTicket && remainingTickets.value > 0 && !isEventPast(event.value.startAt)
 })
 
@@ -282,7 +342,7 @@ const formatDate = (dateString: string) => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -292,7 +352,9 @@ const isEventPast = (startAt: string) => {
 
 const getImageUrl = (url: string) => {
   if (url.startsWith('http')) return url
-  const API_BASE_URL = (import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql').replace('/graphql', '')
+  const API_BASE_URL = (
+    import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql'
+  ).replace('/graphql', '')
   return `${API_BASE_URL}${url}`
 }
 
@@ -303,17 +365,17 @@ const openImageModal = (image: any) => {
 
 const bookTicket = async () => {
   if (!event.value) return
-  
+
   booking.value = true
-  
+
   try {
     await bookTicketMutation({
       eventId: event.value.id,
-      type: 'General Admission'
+      type: 'General Admission',
     })
-    
+
     toast.success('Ticket booked successfully!')
-    
+
     // Immediately update local capacity info for snappy UX
     if (capacityInfo.value) {
       const newRemaining = Math.max(0, (capacityInfo.value.remaining ?? 0) - 1)
@@ -321,7 +383,7 @@ const bookTicket = async () => {
       capacityInfo.value = {
         ...capacityInfo.value,
         remaining: newRemaining,
-        booked: newBooked
+        booked: newBooked,
       }
     }
 
@@ -340,12 +402,12 @@ const bookTicket = async () => {
 // Watch for subscription updates
 watch(
   () => subscriptionResult.value,
-  (newResult) => {
+  newResult => {
     if (newResult?.eventCapacityChanged) {
       const data = newResult.eventCapacityChanged
       capacityInfo.value = data
       toast.info(`Live update: ${data.remaining} tickets remaining!`, { timeout: 3000 })
-      
+
       // Also refetch the event query to get latest data
       if (refetch) {
         refetch()
@@ -356,15 +418,20 @@ watch(
 )
 
 // Watch for event data to initialize capacity info
-watch(event, (newEvent) => {
-  if (newEvent && !capacityInfo.value) {
-    capacityInfo.value = {
-      eventId: newEvent.id,
-      capacity: newEvent.capacity,
-      remaining: newEvent.capacity - (newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0),
-      booked: newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0
+watch(
+  event,
+  newEvent => {
+    if (newEvent && !capacityInfo.value) {
+      capacityInfo.value = {
+        eventId: newEvent.id,
+        capacity: newEvent.capacity,
+        remaining:
+          newEvent.capacity -
+          (newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0),
+        booked: newEvent.tickets?.filter((t: any) => t.status === 'CONFIRMED').length || 0,
+      }
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 </script>
-

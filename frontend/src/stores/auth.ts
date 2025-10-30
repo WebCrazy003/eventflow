@@ -12,7 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false)
 
   const isAuthenticated = computed(() => !!accessToken.value)
-  
+
   const hasRole = computed(() => (roles: Role[]) => {
     if (!user.value) return false
     return roles.some(role => user.value!.roles.includes(role))
@@ -23,28 +23,28 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Login mutation
   const { mutate: loginMutation } = useMutation(LOGIN_MUTATION)
-  
+
   const login = async (email: string, password: string) => {
     isLoading.value = true
     try {
       const result = await loginMutation({
-        input: { email, password }
+        input: { email, password },
       })
-      
+
       if (result?.data?.login) {
         const { accessToken: token, refreshToken: refresh, user: userData } = result.data.login
-        
+
         // Store tokens
         localStorage.setItem('accessToken', token)
         localStorage.setItem('refreshToken', refresh)
-        
+
         accessToken.value = token
         refreshToken.value = refresh
         user.value = userData
-        
+
         return { success: true, user: userData }
       }
-      
+
       throw new Error('Login failed')
     } catch (error) {
       console.error('Login error:', error)
@@ -56,45 +56,52 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Register mutation
   const { mutate: registerMutation } = useMutation(REGISTER_MUTATION)
-  
+
   const register = async (name: string, email: string, password: string) => {
     isLoading.value = true
     try {
       const result = await registerMutation({
-        input: { name, email, password }
+        input: { name, email, password },
       })
-      
+
       if (result?.data?.register) {
         const { accessToken: token, refreshToken: refresh, user: userData } = result.data.register
-        
+
         // Store tokens
         localStorage.setItem('accessToken', token)
         localStorage.setItem('refreshToken', refresh)
-        
+
         accessToken.value = token
         refreshToken.value = refresh
         user.value = userData
-        
+
         return { success: true, user: userData }
       }
-      
+
       throw new Error('Registration failed')
     } catch (error) {
       console.error('Registration error:', error)
-      return { success: false, error: error instanceof Error ? error.message : 'Registration failed' }
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Registration failed',
+      }
     } finally {
       isLoading.value = false
     }
   }
 
   // Get current user
-  const { refetch: refetchUser } = useQuery(ME_QUERY, {}, {
-    enabled: false
-  })
-  
+  const { refetch: refetchUser } = useQuery(
+    ME_QUERY,
+    {},
+    {
+      enabled: false,
+    }
+  )
+
   const fetchUser = async () => {
     if (!accessToken.value) return null
-    
+
     try {
       const result = await refetchUser()
       if (result?.data?.me) {
@@ -112,7 +119,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     accessToken.value = null
     refreshToken.value = null
-    
+
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
   }
@@ -124,7 +131,7 @@ export const useAuthStore = defineStore('auth', () => {
   const setTokens = (access: string, refresh: string) => {
     accessToken.value = access
     refreshToken.value = refresh
-    
+
     localStorage.setItem('accessToken', access)
     localStorage.setItem('refreshToken', refresh)
   }
