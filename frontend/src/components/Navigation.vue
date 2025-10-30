@@ -40,17 +40,7 @@
               Admin
             </router-link>
 
-            <div class="flex items-center space-x-2">
-              <span class="text-sm text-gray-700">
-                {{ authStore.user?.name }}
-              </span>
-              <button 
-                @click="handleLogout"
-                class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
-            </div>
+            <UserAvatar :name="authStore.user?.name || ''" @logout="handleLogout" />
           </template>
 
           <template v-else>
@@ -77,16 +67,19 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToast()
+
 
 const handleLogout = () => {
   authStore.logout()
   toast.success('Logged out successfully')
   router.push('/')
 }
+
 </script>
 
 
