@@ -14,8 +14,8 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository }}-backend
-  FRONTEND_IMAGE: ghcr.io/${{ github.repository }}-frontend
+  BACKEND_IMAGE: ghcr.io/${{ toLower(github.repository) }}-backend
+  FRONTEND_IMAGE: ghcr.io/${{ toLower(github.repository) }}-frontend
   POSTGRES_DB_URL: postgresql://root:password@localhost:5432/eventflow
 
 jobs:
