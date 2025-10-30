@@ -28,6 +28,9 @@ const props = withDefaults(
   {
     type: 'text',
     required: false,
+    label: '',
+    placeholder: '',
+    inputId: '',
   }
 )
 

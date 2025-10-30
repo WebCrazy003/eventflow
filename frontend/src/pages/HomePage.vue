@@ -136,7 +136,7 @@ import { ref, onMounted } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { EVENTS_QUERY } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
-import type { Event } from '@/types'
+import type { Event, EventConnection } from '@/types'
 import HeroSection from '@/components/HeroSection.vue'
 import EventCard from '@/components/EventCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -150,10 +150,12 @@ const { onResult, refetch } = useQuery(EVENTS_QUERY, {
   pagination: { first: 6 },
 })
 
-const onFetchComplete = (result: any) => {
-  if (result?.data?.events) {
-    const { edges: eventArray } = result?.data?.events
-    events.value = eventArray.map((edge: any) => edge.node)
+type EventsQueryResult = { events: EventConnection }
+const onFetchComplete = (result: { data?: Partial<EventsQueryResult> }) => {
+  const eventConnection = result.data?.events
+  if (eventConnection && Array.isArray(eventConnection.edges)) {
+    const eventArray = eventConnection.edges
+    events.value = eventArray.map(edge => edge.node as Event)
   }
 }
 onResult(onFetchComplete)

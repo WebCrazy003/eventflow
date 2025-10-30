@@ -236,7 +236,7 @@ import {
 } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import type { Event as GQLEvent, CreateEventInput, EventImage } from '@/types'
+import type { Event as GQLEvent, CreateEventInput, EventImage, EventConnection } from '@/types'
 import StatCard from '@/components/StatCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -290,16 +290,16 @@ const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/g
 const API_BASE_URL = GRAPHQL_URL.replace('/graphql', '')
 
 const events = computed(() => {
-  return result.value?.events.edges.map((edge: any) => edge.node) || []
+  const conn = result.value?.events as EventConnection | undefined
+  return conn ? conn.edges.map(edge => edge.node as GQLEvent) : []
 })
 
 const totalEvents = computed(() => events.value.length)
 
 const totalTickets = computed(() => {
-  return events.value.reduce((total: number, event: any) => {
-    return (
-      total + (event.tickets?.filter((ticket: any) => ticket.status === 'CONFIRMED').length || 0)
-    )
+  return events.value.reduce((total: number, event: GQLEvent) => {
+    const confirmed = event.tickets?.filter(t => t.status === 'CONFIRMED').length || 0
+    return total + confirmed
   }, 0)
 })
 

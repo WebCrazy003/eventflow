@@ -65,7 +65,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useQuery } from '@vue/apollo-composable'
 import { EVENTS_QUERY } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
-import type { Event } from '@/types'
+import type { Event, EventConnection } from '@/types'
 import EventFilters from '@/components/EventFilters.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -98,12 +98,12 @@ const {
   },
 })
 
-const onFetchComplete = (result: any) => {
-  if (result?.data) {
-    const { data } = result
-    events.value = data.events.edges.map((edge: any) => edge.node)
+const onFetchComplete = (result: { data?: { events: EventConnection } }) => {
+  const data = result.data
+  if (data?.events) {
+    events.value = data.events.edges.map(edge => edge.node as Event)
     hasNextPage.value = data.events.pageInfo.hasNextPage
-    endCursor.value = data.events.pageInfo.endCursor
+    endCursor.value = data.events.pageInfo.endCursor || null
     loading.value = false
   }
 }
@@ -121,7 +121,10 @@ const loadMore = async () => {
           after: endCursor.value,
         },
       },
-      updateQuery: (previousResult: any, { fetchMoreResult }: any) => {
+      updateQuery: (
+        previousResult: { events: EventConnection },
+        { fetchMoreResult }: { fetchMoreResult?: { events: EventConnection } }
+      ) => {
         if (!fetchMoreResult) return previousResult
 
         const newEdges = fetchMoreResult.events.edges || []

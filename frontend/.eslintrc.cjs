@@ -16,6 +16,11 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     // Vue SFC names are fine as single-word in this project
     'vue/multi-word-component-names': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
+    '@typescript-eslint/no-explicit-any': 'error',
   },
   ignorePatterns: ['dist/', 'node_modules/', 'coverage/'],
 }

@@ -148,7 +148,7 @@ const { mutate: cancelTicketMutation } = useMutation(CANCEL_TICKET_MUTATION)
 const tickets = ref<Ticket[]>([])
 
 // Function to be called after fetching result
-const onFetchComplete = (result: any) => {
+const onFetchComplete = (result: { data?: { myTickets: Ticket[] } }) => {
   if (result?.data) {
     tickets.value = result.data.myTickets
   }

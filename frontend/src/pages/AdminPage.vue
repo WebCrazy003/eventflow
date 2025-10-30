@@ -199,7 +199,7 @@ import {
 } from '@/graphql/queries'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
-import type { User, Role } from '@/types'
+import type { User, Role, Event as GQLEvent, EventConnection } from '@/types'
 import StatCard from '@/components/StatCard.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import Modal from '@/components/Modal.vue'
@@ -221,12 +221,15 @@ const { mutate: updateUserRolesMutation } = useMutation(UPDATE_USER_ROLES_MUTATI
 const { mutate: deleteUserMutation } = useMutation(DELETE_USER_MUTATION)
 
 const users = computed(() => usersResult.value?.users || [])
-const events = computed(() => eventsResult.value?.events.edges.map((edge: any) => edge.node) || [])
+const events = computed(() => {
+  const conn = eventsResult.value?.events as EventConnection | undefined
+  return conn ? conn.edges.map(edge => edge.node as GQLEvent) : []
+})
 
 const totalUsers = computed(() => users.value.length)
 const totalEvents = computed(() => events.value.length)
 const totalTickets = computed(() => {
-  return events.value.reduce((total: number, event: any) => {
+  return events.value.reduce((total: number, event: GQLEvent) => {
     return total + (event.tickets?.length || 0)
   }, 0)
 })
