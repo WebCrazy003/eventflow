@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from 'graphql-tag'
 
 export const typeDefs = gql`
   scalar DateTime
@@ -64,7 +64,6 @@ export const typeDefs = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
   }
-
 
   type AuthPayload {
     accessToken: String!
@@ -171,7 +170,7 @@ export const typeDefs = gql`
     createEvent(input: CreateEventInput!): Event!
     updateEvent(id: ID!, input: UpdateEventInput!): Event!
     deleteEvent(id: ID!): Boolean!
-    
+
     # Event image management
     addEventImage(eventId: ID!, url: String!, alt: String): EventImage!
     removeEventImage(id: ID!): Boolean!
@@ -179,7 +178,6 @@ export const typeDefs = gql`
     # Ticket management
     bookTicket(eventId: ID!, type: String): Ticket!
     cancelTicket(id: ID!): Ticket!
-
 
     # User management (admin only)
     updateUserRoles(userId: ID!, roles: [Role!]!): User!
@@ -190,5 +188,4 @@ export const typeDefs = gql`
     ticketBooked(eventId: ID!): Ticket!
     eventCapacityChanged(eventId: ID!): CapacityInfo!
   }
-
-`;
+`

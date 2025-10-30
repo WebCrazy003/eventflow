@@ -1,13 +1,13 @@
-import { PrismaClient, Role, TicketStatus } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient, Role, TicketStatus } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log('🌱 Starting database seed...')
 
   // Create admin user
-  const adminPassword = await bcrypt.hash('admin123', 10);
+  const adminPassword = await bcrypt.hash('admin123', 10)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@eventflow.com' },
     update: {},
@@ -17,10 +17,10 @@ async function main() {
       password: adminPassword,
       roles: [Role.ADMIN],
     },
-  });
+  })
 
   // Create organizer user
-  const organizerPassword = await bcrypt.hash('organizer123', 10);
+  const organizerPassword = await bcrypt.hash('organizer123', 10)
   const organizer = await prisma.user.upsert({
     where: { email: 'organizer@eventflow.com' },
     update: {},
@@ -30,10 +30,10 @@ async function main() {
       password: organizerPassword,
       roles: [Role.ORGANIZER],
     },
-  });
+  })
 
   // Create regular user
-  const userPassword = await bcrypt.hash('user123', 10);
+  const userPassword = await bcrypt.hash('user123', 10)
   const user = await prisma.user.upsert({
     where: { email: 'user@eventflow.com' },
     update: {},
@@ -43,7 +43,7 @@ async function main() {
       password: userPassword,
       roles: [Role.USER],
     },
-  });
+  })
 
   // Create sample events
   const techConference = await prisma.event.upsert({
@@ -52,14 +52,15 @@ async function main() {
     create: {
       id: 'tech-conf-2024',
       title: 'Tech Conference 2024',
-      description: 'Annual technology conference featuring the latest innovations in software development, AI, and cloud computing.',
+      description:
+        'Annual technology conference featuring the latest innovations in software development, AI, and cloud computing.',
       location: 'San Francisco Convention Center',
       startAt: new Date('2024-06-15T09:00:00Z'),
       endAt: new Date('2024-06-17T18:00:00Z'),
       capacity: 500,
       organizerId: organizer.id,
     },
-  });
+  })
 
   const musicFestival = await prisma.event.upsert({
     where: { id: 'music-fest-2024' },
@@ -74,7 +75,7 @@ async function main() {
       capacity: 1000,
       organizerId: organizer.id,
     },
-  });
+  })
 
   const workshop = await prisma.event.upsert({
     where: { id: 'react-workshop' },
@@ -89,7 +90,7 @@ async function main() {
       capacity: 50,
       organizerId: admin.id,
     },
-  });
+  })
 
   // Create sample images
   // await prisma.image.createMany({
@@ -130,19 +131,19 @@ async function main() {
       },
     ],
     skipDuplicates: true,
-  });
+  })
 
-  console.log('✅ Database seeded successfully!');
-  console.log('👤 Admin user: admin@eventflow.com / admin123');
-  console.log('👤 Organizer: organizer@eventflow.com / organizer123');
-  console.log('👤 User: user@eventflow.com / user123');
+  console.log('✅ Database seeded successfully!')
+  console.log('👤 Admin user: admin@eventflow.com / admin123')
+  console.log('👤 Organizer: organizer@eventflow.com / organizer123')
+  console.log('👤 User: user@eventflow.com / user123')
 }
 
 main()
-  .catch((e) => {
-    console.error('❌ Error seeding database:', e);
-    process.exit(1);
+  .catch(e => {
+    console.error('❌ Error seeding database:', e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })

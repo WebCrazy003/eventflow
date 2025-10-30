@@ -1,9 +1,9 @@
-import { authResolvers } from './auth';
-import { eventResolvers } from './events';
-import { ticketResolvers } from './tickets';
-import { userResolvers } from './users';
-import { subscriptionResolvers } from './subscriptions';
-import { imageResolvers } from './images';
+import { authResolvers } from './auth'
+import { eventResolvers } from './events'
+import { ticketResolvers } from './tickets'
+import { userResolvers } from './users'
+import { subscriptionResolvers } from './subscriptions'
+import { imageResolvers } from './images'
 
 export const resolvers = {
   Query: {
@@ -22,4 +22,4 @@ export const resolvers = {
   Subscription: {
     ...subscriptionResolvers.Subscription,
   },
-};
+}

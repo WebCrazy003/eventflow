@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals'
 import { PrismaClient } from '@prisma/client'
-import { hashPassword, verifyPassword, generateAccessToken, verifyAccessToken } from '../src/auth/utils'
+import {
+  hashPassword,
+  verifyPassword,
+  generateAccessToken,
+  verifyAccessToken,
+} from '../src/auth/utils'
 import { Role } from '@prisma/client'
 
 const prisma = new PrismaClient()
@@ -10,7 +15,7 @@ describe('Authentication Utils', () => {
     it('should hash a password', async () => {
       const password = 'testpassword123'
       const hashed = await hashPassword(password)
-      
+
       expect(hashed).toBeDefined()
       expect(hashed).not.toBe(password)
       expect(hashed.length).toBeGreaterThan(0)
@@ -21,7 +26,7 @@ describe('Authentication Utils', () => {
     it('should verify a correct password', async () => {
       const password = 'testpassword123'
       const hashed = await hashPassword(password)
-      
+
       const isValid = await verifyPassword(password, hashed)
       expect(isValid).toBe(true)
     })
@@ -30,7 +35,7 @@ describe('Authentication Utils', () => {
       const password = 'testpassword123'
       const wrongPassword = 'wrongpassword'
       const hashed = await hashPassword(password)
-      
+
       const isValid = await verifyPassword(wrongPassword, hashed)
       expect(isValid).toBe(false)
     })
@@ -43,9 +48,9 @@ describe('Authentication Utils', () => {
         email: 'test@example.com',
         roles: [Role.USER],
       }
-      
+
       const token = generateAccessToken(payload)
-      
+
       expect(token).toBeDefined()
       expect(typeof token).toBe('string')
       expect(token.split('.')).toHaveLength(3) // JWT has 3 parts
@@ -59,10 +64,10 @@ describe('Authentication Utils', () => {
         email: 'test@example.com',
         roles: [Role.USER],
       }
-      
+
       const token = generateAccessToken(payload)
       const verified = verifyAccessToken(token)
-      
+
       expect(verified).toBeDefined()
       expect(verified?.userId).toBe(payload.userId)
       expect(verified?.email).toBe(payload.email)
@@ -72,7 +77,7 @@ describe('Authentication Utils', () => {
     it('should return null for invalid token', () => {
       const invalidToken = 'invalid.token.here'
       const verified = verifyAccessToken(invalidToken)
-      
+
       expect(verified).toBeNull()
     })
   })
