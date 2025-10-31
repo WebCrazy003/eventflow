@@ -122,7 +122,7 @@ if ! node -e "require('graphql-ws')" 2>/dev/null; then
   npm install --prefix "${TMP_DIR}" graphql-ws >/dev/null 2>&1 || {
     echo "ERROR: Failed to install graphql-ws. Trying with npx..." >&2
     # Will use npx in subscription script
-  fi
+  }
 fi
 
 echo "==================== ACCEPTANCE TEST ===================="
