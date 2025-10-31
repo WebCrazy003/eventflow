@@ -214,11 +214,11 @@ jobs:
           
           echo "⚠ Frontend did not become ready, but continuing with acceptance tests..."
 
-      - name: Install graphql-ws (for subscription client)
+      - name: Install graphql-ws and ws (for subscription client)
         run: |
           cd test
           npm init -y --silent
-          npm install graphql-ws --no-save --silent || echo "Warning: Could not install graphql-ws"
+          npm install graphql-ws ws --no-save --silent || echo "Warning: Could not install graphql-ws/ws"
 
       - name: Run Acceptance Tests
         run: |

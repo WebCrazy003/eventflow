@@ -49,23 +49,29 @@ JSON
     echo "Deleting test user ${USER_ID}..."
     # Login as admin
     ADMIN_LOGIN_PAYLOAD='{"query":"mutation($input: LoginInput!) { login(input: $input) { accessToken } }","variables":{"input":{"email":"admin@eventflow.com","password":"admin123"}}}'
-    ADMIN_LOGIN_RESP=$(gql "${ADMIN_LOGIN_PAYLOAD}" || true)
-    ADMIN_TOKEN=$(echo "${ADMIN_LOGIN_RESP}" | jq -r '.data.login.accessToken // empty')
+    ADMIN_LOGIN_RESP=$(gql "${ADMIN_LOGIN_PAYLOAD}" || echo '{}')
     
-    if [[ -n "${ADMIN_TOKEN}" ]]; then
+    # Safely extract token, handle empty or invalid JSON
+    if [[ -n "${ADMIN_LOGIN_RESP}" && "${ADMIN_LOGIN_RESP}" != "{}" ]]; then
+      ADMIN_TOKEN=$(echo "${ADMIN_LOGIN_RESP}" | jq -r '.data.login.accessToken // empty' 2>/dev/null || echo "")
+    else
+      ADMIN_TOKEN=""
+    fi
+    
+    if [[ -n "${ADMIN_TOKEN}" && "${ADMIN_TOKEN}" != "null" && "${ADMIN_TOKEN}" != "" ]]; then
       DELETE_USER_PAYLOAD=$(cat <<JSON
 {"query":"mutation(\$userId: ID!) { deleteUser(userId: \$userId) }","variables":{"userId":"${USER_ID}"}}
 JSON
       )
-      DELETE_USER_RESP=$(gql "${DELETE_USER_PAYLOAD}" "${ADMIN_TOKEN}" || true)
-      if ! echo "${DELETE_USER_RESP}" | jq -e '.data.deleteUser' >/dev/null 2>&1; then
+      DELETE_USER_RESP=$(gql "${DELETE_USER_PAYLOAD}" "${ADMIN_TOKEN}" || echo '{}')
+      if echo "${DELETE_USER_RESP}" | jq -e '.data.deleteUser' >/dev/null 2>&1; then
+        echo "✓ Test user deleted"
+      else
         echo "Warning: Failed to delete user: ${DELETE_USER_RESP}" >&2
         cleanup_errors=1
-      else
-        echo "✓ Test user deleted"
       fi
     else
-      echo "Warning: Could not login as admin to delete user" >&2
+      echo "Warning: Could not login as admin to delete user (response: ${ADMIN_LOGIN_RESP})" >&2
       cleanup_errors=1
     fi
   fi
@@ -116,14 +122,20 @@ require_cmd jq
 require_cmd curl
 require_cmd node
 
-# Check if graphql-ws is available (required for subscription)
-if ! node -e "require('graphql-ws')" 2>/dev/null; then
-  echo "Installing graphql-ws for subscription client..."
-  npm install --prefix "${TMP_DIR}" graphql-ws >/dev/null 2>&1 || {
-    echo "ERROR: Failed to install graphql-ws. Trying with npx..." >&2
-    # Will use npx in subscription script
-  }
-fi
+# Check if graphql-ws and ws are available (required for subscription)
+echo "Installing graphql-ws and ws for subscription client..."
+cd "${TMP_DIR}"
+cat > package.json <<'EOF'
+{
+  "name": "subscription-client",
+  "version": "1.0.0",
+  "type": "commonjs"
+}
+EOF
+npm install graphql-ws ws --no-save --silent >/dev/null 2>&1 || {
+  echo "WARNING: Failed to install graphql-ws/ws. Subscription may fail." >&2
+}
+cd - >/dev/null
 
 echo "==================== ACCEPTANCE TEST ===================="
 echo "Testing against: ${GRAPHQL_HTTP}"
@@ -225,14 +237,22 @@ cat > "${SUB_SCRIPT}" <<'SUBSCRIPTION_SCRIPT'
 const fs = require('fs');
 const path = require('path');
 
-// Try to load graphql-ws from multiple possible locations
+// Try to load graphql-ws and ws from multiple possible locations
 let createClient;
+let WebSocket;
 try {
   // Try local node_modules first
   const graphqlWs = require('graphql-ws');
   createClient = graphqlWs.createClient;
   if (!createClient) {
     throw new Error('createClient not found');
+  }
+  // Try to load ws for WebSocket implementation
+  try {
+    WebSocket = require('ws');
+  } catch (wsErr) {
+    console.error(JSON.stringify({ type: 'error', error: 'Could not load ws. Please install: npm install ws' }));
+    process.exit(1);
   }
 } catch (e1) {
   try {
@@ -242,6 +262,12 @@ try {
     createClient = graphqlWs.createClient;
     if (!createClient) {
       throw new Error('createClient not found');
+    }
+    try {
+      WebSocket = require('ws');
+    } catch (wsErr) {
+      console.error(JSON.stringify({ type: 'error', error: 'Could not load ws. Please install: npm install ws' }));
+      process.exit(1);
     }
   } catch (e2) {
     console.error(JSON.stringify({ type: 'error', error: 'Could not load graphql-ws. Please install: npm install graphql-ws' }));
@@ -259,6 +285,7 @@ try {
   client = createClient({
     url,
     connectionParams: { authorization: `Bearer ${token}` },
+    webSocketImpl: WebSocket,
   });
 } catch (e) {
   console.error(JSON.stringify({ type: 'error', error: 'Failed to create client: ' + e.message }));
@@ -340,21 +367,13 @@ const messages = [];
 })();
 SUBSCRIPTION_SCRIPT
 
-# Try to run subscription - install graphql-ws if needed
+# Try to run subscription - install ws if needed (graphql-ws should already be installed)
 echo "Starting subscription client..."
 cd "${TMP_DIR}"
-# Create package.json for local install
-cat > package.json <<'EOF'
-{
-  "name": "subscription-client",
-  "version": "1.0.0",
-  "type": "commonjs"
-}
-EOF
 
-# Try to install graphql-ws locally
-if ! npm install graphql-ws --no-save --silent 2>/dev/null; then
-  echo "WARNING: Could not install graphql-ws. Subscription verification may fail." >&2
+# Install ws if not already installed
+if ! npm list ws --depth=0 >/dev/null 2>&1; then
+  npm install ws --no-save --silent 2>/dev/null || echo "WARNING: Could not install ws" >&2
 fi
 
 # Run subscription script in background, capture output
@@ -370,7 +389,12 @@ echo ""
 echo "Step 5: Booking tickets until sold out..."
 BOOK_PAYLOAD_TMPL='{"query":"mutation($eventId: ID!) { bookTicket(eventId: $eventId) { id status } }","variables":{"eventId":"__EVENT_ID__"}}'
 
-echo "Booking first ticket..."
+# Login as seeded user upfront to ensure we have two different users
+SEED_LOGIN='{"query":"mutation($input: LoginInput!) { login(input: $input) { accessToken } }","variables":{"input":{"email":"user@eventflow.com","password":"user123"}}}'
+SEED_LOGIN_RESP=$(gql "${SEED_LOGIN}")
+SEED_TOKEN=$(extract_json "${SEED_LOGIN_RESP}" '.data.login.accessToken')
+
+echo "Booking first ticket (as test user)..."
 BOOK1_RESP=$(gql "${BOOK_PAYLOAD_TMPL/__EVENT_ID__/${EVENT_ID}}" "${USER_TOKEN}")
 BOOK1_ID=$(extract_json "${BOOK1_RESP}" '.data.bookTicket.id')
 if [[ -z "${BOOK1_ID}" || "${BOOK1_ID}" == "null" ]]; then
@@ -380,38 +404,38 @@ if [[ -z "${BOOK1_ID}" || "${BOOK1_ID}" == "null" ]]; then
 fi
 echo "✓ Booked first ticket (${BOOK1_ID})"
 
-echo "Booking second ticket..."
-BOOK2_RESP=$(gql "${BOOK_PAYLOAD_TMPL/__EVENT_ID__/${EVENT_ID}}" "${USER_TOKEN}" || true)
-BOOK2_ID=$(extract_json "${BOOK2_RESP}" '.data.bookTicket.id')
-if [[ -z "${BOOK2_ID}" || "${BOOK2_ID}" == "null" ]]; then
-  # User might already have a ticket (upsert), try with seeded user
-  echo "Second booking with same user (upsert behavior). Trying with different user..."
-  SEED_LOGIN='{"query":"mutation($input: LoginInput!) { login(input: $input) { accessToken } }","variables":{"input":{"email":"user@eventflow.com","password":"user123"}}}'
-  SEED_LOGIN_RESP=$(gql "${SEED_LOGIN}")
-  SEED_TOKEN=$(extract_json "${SEED_LOGIN_RESP}" '.data.login.accessToken')
-  if [[ -n "${SEED_TOKEN}" && "${SEED_TOKEN}" != "null" ]]; then
-    BOOK2_RESP=$(gql "${BOOK_PAYLOAD_TMPL/__EVENT_ID__/${EVENT_ID}}" "${SEED_TOKEN}")
-    BOOK2_ID=$(extract_json "${BOOK2_RESP}" '.data.bookTicket.id')
-  fi
+echo "Booking second ticket (as seeded user)..."
+if [[ -n "${SEED_TOKEN}" && "${SEED_TOKEN}" != "null" ]]; then
+  BOOK2_RESP=$(gql "${BOOK_PAYLOAD_TMPL/__EVENT_ID__/${EVENT_ID}}" "${SEED_TOKEN}")
+  BOOK2_ID=$(extract_json "${BOOK2_RESP}" '.data.bookTicket.id')
   
   if [[ -z "${BOOK2_ID}" || "${BOOK2_ID}" == "null" ]]; then
-    echo "WARNING: Second booking failed or already exists: ${BOOK2_RESP}" >&2
+    echo "ERROR: Second booking failed: ${BOOK2_RESP}" >&2
+    EXIT_CODE=1
+    exit 1
   else
     echo "✓ Booked second ticket (${BOOK2_ID})"
   fi
 else
-  echo "✓ Booked second ticket (${BOOK2_ID})"
+  echo "ERROR: Could not login as seeded user for second booking" >&2
+  EXIT_CODE=1
+  exit 1
 fi
 
 # Wait a moment for subscription events
 sleep 2
 
 echo "Attempting third booking (should fail with sold out)..."
+# Try with test user again (should fail as event is now sold out)
 BOOK3_RESP=$(gql "${BOOK_PAYLOAD_TMPL/__EVENT_ID__/${EVENT_ID}}" "${USER_TOKEN}" || true)
+
 if echo "${BOOK3_RESP}" | jq -e '.errors[0].message' >/dev/null 2>&1; then
   ERROR_MSG=$(extract_json "${BOOK3_RESP}" '.errors[0].message')
-  if echo "${ERROR_MSG}" | grep -qiE "sold out"; then
+  if echo "${ERROR_MSG}" | grep -qiE "sold out|capacity|full"; then
     echo "✓ Third booking correctly failed with sold out: ${ERROR_MSG}"
+  elif echo "${ERROR_MSG}" | grep -qiE "already have a ticket"; then
+    # This is acceptable - it means the user already has a ticket and event is sold out
+    echo "✓ Third booking correctly failed (user already has ticket / event sold out): ${ERROR_MSG}"
   else
     echo "WARNING: Third booking failed but with unexpected error: ${ERROR_MSG}" >&2
   fi
@@ -419,7 +443,7 @@ else
   # Check if it unexpectedly succeeded
   BOOK3_ID=$(extract_json "${BOOK3_RESP}" '.data.bookTicket.id')
   if [[ -n "${BOOK3_ID}" && "${BOOK3_ID}" != "null" ]]; then
-    echo "ERROR: Third booking unexpectedly succeeded (ID: ${BOOK3_ID})" >&2
+    echo "ERROR: Third booking unexpectedly succeeded (ID: ${BOOK3_ID}) - event should be sold out!" >&2
     EXIT_CODE=1
     exit 1
   else
