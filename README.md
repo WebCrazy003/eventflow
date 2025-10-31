@@ -36,21 +36,6 @@ EventFlow is a full‑stack event management and ticketing app built with a Grap
 - Database: PostgreSQL
 - Object storage: Supabase Storage (for event images)
 
-## Application Workflow
-
-1. **Authentication**
-   - Users sign up or log in; the backend issues JWTs. The frontend stores tokens and attaches them to subsequent GraphQL requests.
-2. **Browse and filter events**
-   - Users load events with filters (search text, date range, organizer). The backend resolves queries via Prisma.
-3. **Event details**
-   - Fetches event metadata, image(s), remaining capacity, and related tickets for the current user.
-4. **Booking flow**
-   - User (role: USER) books a ticket. Backend checks capacity and uniqueness (`userId + eventId`), creates a `Ticket`, and emits a subscription update.
-5. **Organizer/Admin management**
-   - ORGANIZER creates/edits events they own; ADMIN can manage any event/user. Image uploads go to Supabase and URLs are persisted.
-6. **Real‑time updates**
-   - Subscriptions broadcast capacity/ticket changes; connected clients update without refresh.
-
 ## Database Structure
 
 Tables (Prisma models):
@@ -88,21 +73,50 @@ npx prisma db seed         # Seed database
 
 ## Testing
 
+This repo includes unit, integration, and acceptance tests.
+
 ### Backend
 
-```bash
-cd backend
-npm install
-npm test
-```
+- **Unit tests**: Focus on isolated logic (auth utils, role checks, resolvers’ helpers).
+
+  - Location: `backend/tests/*.test.ts`
+  - Run:
+    ```bash
+    cd backend
+    npm install
+    npm test
+    ```
+
+- **Integration tests**: Start the GraphQL server against a test DB, exercise queries/mutations including auth and bookings.
+  - Examples: `integration.events.test.ts`, `integration.booking.test.ts`
+  - Requires a Postgres instance (Docker compose provides one) and seeded data.
+  - Run (with services up):
+    ```bash
+    cd backend
+    npm test
+    ```
 
 ### Frontend
 
-```bash
-cd frontend
-npm install
-npm test
-```
+- **Unit/component tests**: Vue components with Vitest + Vue Test Utils (rendering, props, events, input validation).
+  - Location: `frontend/tests/**` and `frontend/src/components/__tests__/`
+  - Run:
+    ```bash
+    cd frontend
+    npm install
+    npm test
+    ```
+
+### End‑to‑end / Acceptance
+
+- A minimal acceptance script is included to validate end‑to‑end flows against a running stack (API + DB + frontend).
+  - Location: `test/acceptance.sh` and `test/subscription_client.js`
+  - Typical flow: bring up services with Docker Compose, then run the acceptance script to verify booking/subscription behavior.
+  - Example:
+    ```bash
+    # from repo root, with docker-compose up -d already running
+    bash test/acceptance.sh
+    ```
 
 ## Local Development
 
@@ -117,8 +131,6 @@ npm test
 cp backend/env.example backend/.env
 cp frontend/env.example frontend/.env
 ```
-
-> The example files have sensible defaults for local use.
 
 ### Start with Docker Compose (recommended)
 
@@ -137,26 +149,3 @@ This will:
 
 - Frontend: http://localhost:3000
 - GraphQL API: http://localhost:4000/graphql
-
-## Authentication and Roles
-
-- **USER**: Browse events, book tickets, view own tickets
-- **ORGANIZER**: Create/manage own events and images
-- **ADMIN**: Full access
-
-## Local Demo Credentials
-
-After seeding the database:
-
-- Admin: `admin@eventflow.com` / `admin123`
-- Organizer: `organizer@eventflow.com` / `organizer123`
-- User: `user@eventflow.com` / `user123`
-
-## Deployed URLs & Online Credentials
-
-- Backend GraphQL: `https://eventflow-backend-latest.onrender.com/graphql`
-- Frontend: `https://eventflow-frontend-latest.onrender.com`
-- Credentials (same as local demo):
-  - Admin: `admin@eventflow.com` / `admin123`
-  - Organizer: `organizer@eventflow.com` / `organizer123`
-  - User: `user@eventflow.com` / `user123`
