@@ -49,6 +49,10 @@ This section describes a typical GitHub Actions workflow for this monorepo that 
 ### What the workflow does (step by step)
 
 https://github.com/WebCrazy003/eventflow/actions
+<img width="925" height="184" alt="image" src="https://github.com/user-attachments/assets/62564a3a-a76c-446e-afe1-12074fe58142" />
+
+https://dashboard.render.com/
+<img width="946" height="425" alt="image" src="https://github.com/user-attachments/assets/427a7967-8ad9-4b45-bac1-9170c1b6a1ef" />
 
 1. **Trigger**
 
