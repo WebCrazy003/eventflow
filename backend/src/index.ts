@@ -16,6 +16,8 @@ import { resolvers } from './resolvers'
 import { createContext } from './context'
 import { authMiddleware } from './auth/middleware'
 import { upload, uploadDir } from './utils/upload'
+import { getSupabase, getPublicUrlForKey } from './utils/supabase'
+import crypto from 'crypto'
 
 // Load environment variables
 dotenv.config()
@@ -104,7 +106,7 @@ async function startServer() {
     })
   )
 
-  // Serve static files from uploads directory
+  // Serve static files from uploads directory (legacy/local mode support)
   app.use('/uploads', express.static(path.join(process.cwd(), uploadDir)))
 
   // File upload endpoint
@@ -116,16 +118,47 @@ async function startServer() {
       req: import('express').Request & { file?: Express.Multer.File },
       res: import('express').Response
     ) => {
-      if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' })
-      }
+      try {
+        if (!req.file) {
+          return res.status(400).json({ error: 'No file uploaded' })
+        }
 
-      const fileUrl = `/uploads/${req.file.filename}`
-      return res.json({
-        url: fileUrl,
-        filename: req.file.filename,
-        path: req.file.path,
-      })
+        const supabaseBucket = process.env.SUPABASE_BUCKET
+        if (!supabaseBucket) {
+          return res
+            .status(500)
+            .json({ error: 'Storage not configured: SUPABASE_BUCKET is missing' })
+        }
+
+        const ext = path.extname(req.file.originalname) || '.jpg'
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`
+        const randomHex = crypto.randomBytes(4).toString('hex')
+        const filename = `event-${uniqueSuffix}-${randomHex}${ext}`
+        const key = filename // flat structure; could be prefixed with folders if desired
+
+        const supabase = getSupabase()
+        const { error: uploadError } = await supabase.storage
+          .from(supabaseBucket)
+          .upload(key, req.file.buffer, {
+            contentType: req.file.mimetype,
+            upsert: false,
+          })
+
+        if (uploadError) {
+          return res.status(500).json({ error: `Upload failed: ${uploadError.message}` })
+        }
+
+        const url = getPublicUrlForKey(supabaseBucket, key)
+
+        return res.json({
+          url,
+          filename,
+          path: key, // storage object key
+        })
+      } catch (e) {
+        const message = e instanceof Error ? e.message : 'Unknown error'
+        return res.status(500).json({ error: message })
+      }
     }
   )
 
